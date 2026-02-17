@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 Santee Golf Trip</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-900: #1a3a1a;
+    --green-800: #234d23;
+    --green-700: #2d6a2d;
+    --green-600: #3d8b3d;
+    --green-500: #4caf50;
+    --green-400: #66bb6a;
+    --green-300: #a5d6a7;
+    --green-200: #c8e6c9;
+    --green-100: #e8f5e9;
+    --green-50: #f1f8f1;
+    --gold: #c9a84c;
+    --gold-light: #e8d48b;
+    --gold-dark: #a08030;
+    --cream: #faf8f2;
+    --sand: #f0ead6;
+    --dark: #1a1a18;
+    --gray-800: #2d2d2a;
+    --gray-600: #5a5a55;
+    --gray-400: #8a8a85;
+    --gray-200: #d4d4cf;
+    --gray-100: #eaeae5;
+    --white: #ffffff;
+    --red-accent: #c0392b;
+    --blue-accent: #2471a3;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--dark);
+    overflow-x: hidden;
+  }
+
+  /* === HERO === */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(165deg, var(--green-900) 0%, var(--green-800) 40%, var(--green-700) 100%);
+    overflow: hidden;
+    padding: 40px 20px;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 80%, rgba(76,175,80,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 20%, rgba(201,168,76,0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 800px;
+  }
+
+  .hero-year {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1.05;
+    margin-bottom: 12px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-location {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--green-300);
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.5s forwards;
+  }
+
+  .hero-purse {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(12px);
+    padding: 16px 32px;
+    border-radius: 60px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.7s forwards;
+  }
+
+  .hero-purse .label {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--green-300);
+  }
+
+  .hero-purse .amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  .hero-purse .per-man {
+    font-size: 13px;
+    color: var(--green-300);
+    opacity: 0.8;
+  }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--green-400);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 0.8s 1s forwards;
+  }
+
+  .scroll-indicator .arrow {
+    width: 20px;
+    height: 20px;
+    border-right: 2px solid var(--green-400);
+    border-bottom: 2px solid var(--green-400);
+    transform: rotate(45deg);
+    animation: bounceDown 1.5s infinite;
+  }
+
+  /* === RULES SECTION === */
+  .rules-section {
+    padding: 80px 20px;
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-200);
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--green-600);
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 32px;
+    line-height: 1.2;
+  }
+
+  .rules-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .rule-card {
+    background: var(--green-50);
+    border: 1px solid var(--green-200);
+    border-radius: 12px;
+    padding: 24px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .rule-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  }
+
+  .rule-card h4 {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--green-700);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .rule-card p {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--gray-600);
+  }
+
+  .rule-card.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .busch-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--blue-accent);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  /* === DAY CARDS === */
+  .days-section {
+    padding: 60px 20px 100px;
+  }
+
+  .day-card {
+    max-width: 960px;
+    margin: 0 auto 48px;
+    background: var(--white);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.06);
+    border: 1px solid var(--gray-200);
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.6s, transform 0.6s;
+  }
+
+  .day-card.animate-ready {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  .day-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .day-header {
+    display: flex;
+    align-items: stretch;
+    background: var(--green-900);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .day-header::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 60%, rgba(201,168,76,0.08) 100%);
+    pointer-events: none;
+  }
+
+  .day-number {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 100px;
+    padding: 20px;
+    background: rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 1;
+  }
+
+  .day-number .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .day-number .label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--green-300);
+    margin-top: 4px;
+  }
+
+  .day-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 20px 28px;
+    gap: 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .day-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--white);
+    min-width: 140px;
+  }
+
+  .day-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .day-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .day-meta-item .meta-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--green-400);
+    font-weight: 500;
+  }
+
+  .day-meta-item .meta-value {
+    font-size: 15px;
+    color: var(--white);
+    font-weight: 500;
+  }
+
+  .day-body {
+    padding: 28px;
+  }
+
+  .game-description {
+    font-size: 15px;
+    color: var(--gray-600);
+    margin-bottom: 24px;
+    padding-left: 16px;
+    border-left: 3px solid var(--green-300);
+    line-height: 1.6;
+  }
+
+  .game-description strong {
+    color: var(--dark);
+  }
+
+  /* Team Tables */
+  .teams-container {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .teams-container.two-teams {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .teams-container.four-teams {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+
+  .team-block {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--gray-200);
+  }
+
+  .team-label {
+    background: var(--green-700);
+    color: var(--white);
+    text-align: center;
+    padding: 10px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .team-players {
+    background: var(--green-50);
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .team-players .player {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--dark);
+    padding: 4px 0;
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid var(--green-200);
+  }
+
+  .team-players .player:last-child {
+    border-bottom: none;
+  }
+
+  .vs-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gold-dark);
+    padding: 0 4px;
+  }
+
+  /* Payout Bar */
+  .payout-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--sand);
+    border-radius: 10px;
+    padding: 16px 24px;
+    border: 1px solid var(--gray-200);
+  }
+
+  .payout-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .payout-details .payout-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    font-weight: 600;
+  }
+
+  .payout-details .payout-text {
+    font-size: 14px;
+    color: var(--dark);
+    line-height: 1.5;
+  }
+
+  .total-purse {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+
+  .total-purse .purse-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    font-weight: 600;
+  }
+
+  .total-purse .purse-amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--green-700);
+  }
+
+  /* Friday Special */
+  .friday-payout-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .place-chip {
+    text-align: center;
+    padding: 10px 8px;
+    border-radius: 8px;
+    border: 1px solid var(--gray-200);
+    background: var(--white);
+  }
+
+  .place-chip .place {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gray-400);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .place-chip .prize {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--green-700);
+    margin-top: 2px;
+  }
+
+  .place-chip:first-child {
+    background: var(--green-50);
+    border-color: var(--green-300);
+  }
+
+  .place-chip:first-child .place { color: var(--green-700); }
+
+  /* Saturday Special */
+  .saturday-note {
+    background: linear-gradient(135deg, var(--sand) 0%, var(--cream) 100%);
+    border: 1px dashed var(--gold);
+    border-radius: 10px;
+    padding: 24px;
+    text-align: center;
+    font-size: 15px;
+    color: var(--gray-600);
+    line-height: 1.7;
+  }
+
+  .saturday-note strong {
+    color: var(--dark);
+  }
+
+  /* Course tag */
+  .course-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    margin-left: 8px;
+  }
+
+  .tag-gc { background: var(--green-100); color: var(--green-700); }
+  .tag-no-gc { background: #fce4ec; color: var(--red-accent); }
+
+  /* Replay note */
+  .replay-note {
+    font-size: 12px;
+    color: var(--gray-400);
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes bounceDown {
+    0%, 100% { transform: rotate(45deg) translateY(0); }
+    50% { transform: rotate(45deg) translateY(6px); }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .rules-grid { grid-template-columns: 1fr; }
+    .day-header { flex-direction: column; }
+    .day-info { flex-direction: column; gap: 12px; align-items: flex-start; }
+    .day-number { min-width: unset; flex-direction: row; gap: 12px; padding: 14px 20px; width: 100%; }
+    .teams-container.two-teams,
+    .teams-container.four-teams { grid-template-columns: 1fr 1fr; }
+    .payout-bar { flex-direction: column; gap: 16px; align-items: flex-start; }
+    .total-purse { align-items: flex-start; }
+    .friday-payout-grid { grid-template-columns: repeat(2, 1fr); }
+    .vs-badge { display: none; }
+    .day-meta { gap: 16px; }
+  }
+
+  @media (max-width: 480px) {
+    .teams-container.four-teams { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-year">Seventh Annual</div>
+    <h1 class="hero-title">Santee <em>Golf</em> Trip</h1>
+    <div class="hero-location">Santee, South Carolina &bull; 2026</div>
+    <div class="hero-purse">
+      <div>
+        <div class="label">Total Purse</div>
+        <div class="amount">$520</div>
+      </div>
+      <div style="width:1px;height:40px;background:rgba(255,255,255,0.15)"></div>
+      <div>
+        <div class="label">Per Man</div>
+        <div class="amount">$65</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="arrow"></div>
+  </div>
+</section>
+
+<!-- RULES -->
+<section class="rules-section">
+  <div class="container">
+    <div class="section-label">Competition Format</div>
+    <h2 class="section-title">Daily Skin Game &mdash; Sunday thru Friday</h2>
+    <div class="rules-grid">
+      <div class="rule-card">
+        <h4>Skins Paid For</h4>
+        <p>Hole Low Net &bull; All Natural Birdies, Eagles, Double Eagles and Aces &bull; Closest to the Pin (Par 3s)</p>
+      </div>
+      <div class="rule-card">
+        <h4>Aces &amp; Double Eagles</h4>
+        <p>Natural Double Eagles and Natural Aces take <strong>all</strong> of the skin money for the day.</p>
+      </div>
+      <div class="rule-card full-width">
+        <div class="busch-badge">&#9733; BuschLight Cup</div>
+        <h4>Daily Points &mdash; 1st = $20 &bull; 2nd = $12 &bull; 3rd = $8</h4>
+        <p>Totals paid at end of 18 hole play on Friday. Points awarded: Each 9 Hole / 18 Total 4 Man team match = 100 pts. (ties divided) &bull; Each 9 Hole / 18 Hole 2 Man team match = 100 pts. (ties divided) &bull; Individual Chicago 1st 9 holes = 100 pts. (ties divided) &bull; Individual Chicago 2nd 9 holes = 100 pts. (ties divided) &bull; Individual Chicago 18 hole total = 100 pts. (ties divided).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DAY CARDS -->
+<section class="days-section">
+
+  <!-- SUNDAY -->
+  <div class="day-card" data-animate>
+    <div class="day-header">
+      <div class="day-number"><span class="num">01</span><span class="label">Day</span></div>
+      <div class="day-info">
+        <div class="day-name">Sunday</div>
+        <div class="day-meta">
+          <div class="day-meta-item"><span class="meta-label">Tee Time</span><span class="meta-value">8:36 AM</span></div>
+          <div class="day-meta-item"><span class="meta-label">Course</span><span class="meta-value">Lake Marion</span></div>
+          <div class="day-meta-item"><span class="meta-label">Replay</span><span class="meta-value">$15 <span class="course-tag tag-gc">Gift Card OK</span></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="day-body">
+      <div class="game-description"><strong>123 Ball</strong> (net scores) &mdash; (2) 9 Hole Matches and 18 Hole Total</div>
+      <div class="teams-container two-teams" style="grid-template-columns:1fr auto 1fr">
+        <div class="team-block">
+          <div class="team-label">Team 1</div>
+          <div class="team-players">
+            <div class="player">John</div><div class="player">Andrew</div><div class="player">Pete</div><div class="player">Jim</div>
+          </div>
+        </div>
+        <div class="vs-badge">vs</div>
+        <div class="team-block">
+          <div class="team-label">Team 2</div>
+          <div class="team-players">
+            <div class="player">Troy</div><div class="player">Jeff</div><div class="player">Denver</div><div class="player">Scott</div>
+          </div>
+        </div>
+      </div>
+      <div class="payout-bar">
+        <div class="payout-details">
+          <span class="payout-label">Payout</span>
+          <span class="payout-text">$16 to winning team of each 9 holes and total &mdash; $32 in skins</span>
+        </div>
+        <div class="total-purse">
+          <span class="purse-label">Total Purse</span>
+          <span class="purse-amount">$80</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MONDAY -->
+  <div class="day-card" data-animate>
+    <div class="day-header">
+      <div class="day-number"><span class="num">02</span><span class="label">Day</span></div>
+      <div class="day-info">
+        <div class="day-name">Monday</div>
+        <div class="day-meta">
+          <div class="day-meta-item"><span class="meta-label">Tee Time</span><span class="meta-value">8:36 AM</span></div>
+          <div class="day-meta-item"><span class="meta-label">Course</span><span class="meta-value">Santee Cooper</span></div>
+          <div class="day-meta-item"><span class="meta-label">Replay</span><span class="meta-value">$15 <span class="course-tag tag-gc">Gift Card OK</span></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="day-body">
+      <div class="game-description"><strong>2 Man 1 Best Ball</strong> (net scores) &mdash; (2) 9 Hole Matches and 18 Hole Total</div>
+      <div class="teams-container four-teams">
+        <div class="team-block">
+          <div class="team-label">Grp 1 / Team 1</div>
+          <div class="team-players"><div class="player">John</div><div class="player">Denver</div></div>
+        </div>
+        <div class="team-block">
+          <div class="team-label">Grp 1 / Team 2</div>
+          <div class="team-players"><div class="player">Troy</div><div class="player">Scott</div></div>
+        </div>
+        <div class="team-block">
+          <div class="team-label">Grp 2 / Team 3</div>
+          <div class="team-players"><div class="player">Jeff</div><div class="player">Andrew</div></div>
+        </div>
+        <div class="team-block">
+          <div class="team-label">Grp 2 / Team 4</div>
+          <div class="team-players"><div class="player">Pete</div><div class="player">Jim</div></div>
+        </div>
+      </div>
+      <div class="payout-bar">
+        <div class="payout-details">
+          <span class="payout-label">Payout</span>
+          <span class="payout-text">$16 to winning team of each 9 holes and total &mdash; $32 in skins</span>
+        </div>
+        <div class="total-purse"><span class="purse-label">Total Purse</span><span class="purse-amount">$80</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TUESDAY -->
+  <div class="day-card" data-animate>
+    <div class="day-header">
+      <div class="day-number"><span class="num">03</span><span class="label">Day</span></div>
+      <div class="day-info">
+        <div class="day-name">Tuesday</div>
+        <div class="day-meta">
+          <div class="day-meta-item"><span class="meta-label">Tee Time</span><span class="meta-value">9:00 AM</span></div>
+          <div class="day-meta-item"><span class="meta-label">Course</span><span class="meta-value">Wyboo</span></div>
+          <div class="day-meta-item"><span class="meta-label">Replay</span><span class="meta-value">$15/$17 <span class="course-tag tag-no-gc">No Gift Card</span></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="day-body">
+      <div class="game-description"><strong>4 Man Team Chicago</strong></div>
+      <div class="teams-container two-teams" style="grid-template-columns:1fr auto 1fr">
+        <div class="team-block">
+          <div class="team-label">Team 1</div>
+          <div class="team-players"><div class="player">John</div><div class="player">Andrew</div><div class="player">Denver</div><div class="player">Scott</div></div>
+        </div>
+        <div class="vs-badge">vs</div>
+        <div class="team-block">
+          <div class="team-label">Team 2</div>
+          <div class="team-players"><div class="player">Troy</div><div class="player">Jeff</div><div class="player">Pete</div><div class="player">Jim</div></div>
+        </div>
+      </div>
+      <div class="payout-bar">
+        <div class="payout-details"><span class="payout-label">Payout</span><span class="payout-text">$16 to winning team of each 9 holes and total &mdash; $32 in skins</span></div>
+        <div class="total-purse"><span class="purse-label">Total Purse</span><span class="purse-amount">$80</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEDNESDAY -->
+  <div class="day-card" data-animate>
+    <div class="day-header">
+      <div class="day-number"><span class="num">04</span><span class="label">Day</span></div>
+      <div class="day-info">
+        <div class="day-name">Wednesday</div>
+        <div class="day-meta">
+          <div class="day-meta-item"><span class="meta-label">Tee Time</span><span class="meta-value">8:30 AM</span></div>
+          <div class="day-meta-item"><span class="meta-label">Course</span><span class="meta-value">Santee National</span></div>
+          <div class="day-meta-item"><span class="meta-label">Replay</span><span class="meta-value">$15/$17 <span class="course-tag tag-no-gc">No Gift Card</span></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="day-body">
+      <div class="game-description"><strong>4 Man Team using 2 Best Balls</strong> &mdash; (2) 9 Hole Matches and 18 Hole Total</div>
+      <div class="teams-container two-teams" style="grid-template-columns:1fr auto 1fr">
+        <div class="team-block">
+          <div class="team-label">Team 1</div>
+          <div class="team-players"><div class="player">John</div><div class="player">Jeff</div><div class="player">Jim</div><div class="player">Denver</div></div>
+        </div>
+        <div class="vs-badge">vs</div>
+        <div class="team-block">
+          <div class="team-label">Team 2</div>
+          <div class="team-players"><div class="player">Troy</div><div class="player">Andrew</div><div class="player">Pete</div><div class="player">Scott</div></div>
+        </div>
+      </div>
+      <div class="payout-bar">
+        <div class="payout-details"><span class="payout-label">Payout</span><span class="payout-text">$16 to winning team of each 9 holes and total &mdash; $32 in skins</span></div>
+        <div class="total-purse"><span class="purse-label">Total Purse</span><span class="purse-amount">$80</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THURSDAY -->
+  <div class="day-card" data-animate>
+    <div class="day-header">
+      <div class="day-number"><span class="num">05</span><span class="label">Day</span></div>
+      <div class="day-info">
+        <div class="day-name">Thursday</div>
+        <div class="day-meta">
+          <div class="day-meta-item"><span class="meta-label">Tee Time</span><span class="meta-value">9:00 AM</span></div>
+          <div class="day-meta-item"><span class="meta-label">Course</span><span class="meta-value">Players Course</span></div>
+          <div class="day-meta-item"><span class="meta-label">Replay</span><span class="meta-value">$15/$17 <span class="course-tag tag-no-gc">No Gift Card</span></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="day-body">
+      <div class="game-description"><strong>4 Man Designated Hole Plus 1 Best Score</strong> (net scores) &mdash; (2) 9 Hole Matches and 18 Hole Total</div>
+      <div class="teams-container two-teams" style="grid-template-columns:1fr auto 1fr">
+        <div class="team-block">
+          <div class="team-label">Team 1</div>
+          <div class="team-players"><div class="player">John</div><div class="player">Jeff</div><div class="player">Pete</div><div class="player">Scott</div></div>
+        </div>
+        <div class="vs-badge">vs</div>
+        <div class="team-block">
+          <div class="team-label">Team 2</div>
+          <div class="team-players"><div class="player">Troy</div><div class="player">Andrew</div><div class="player">Jim</div><div class="player">Denver</div></div>
+        </div>
+      </div>
+      <div class="payout-bar">
+        <div class="payout-details"><span class="payout-label">Payout</span><span class="payout-text">$16 to winning team of each 9 holes and total &mdash; $32 in skins</span></div>
+        <div class="total-purse"><span class="purse-label">Total Purse</span><span class="purse-amount">$80</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FRIDAY -->
+  <div class="day-card" data-animate>
+    <div class="day-header">
+      <div class="day-number"><span class="num">06</span><span class="label">Day</span></div>
+      <div class="day-info">
+        <div class="day-name">Friday</div>
+        <div class="day-meta">
+          <div class="day-meta-item"><span class="meta-label">Tee Time</span><span class="meta-value">9:16 AM</span></div>
+          <div class="day-meta-item"><span class="meta-label">Course</span><span class="meta-value">Lake Marion</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="day-body">
+      <div class="game-description"><strong>Individual Chicago</strong> &mdash; (2) 9 Hole Matches and 18 Hole Total<br><br>Groupings based on BuschLight Cup points standings:<br>Group 1: 1st thru 4th &bull; Group 2: 5th thru 8th</div>
+      <div class="payout-bar" style="flex-direction:column;align-items:stretch;gap:16px">
+        <div class="payout-details">
+          <span class="payout-label">Payout</span>
+          <span class="payout-text">$10 to winner of each 9 holes &mdash; $35 in skins</span>
+        </div>
+        <div>
+          <div class="payout-label" style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gray-400);font-weight:600;margin-bottom:8px">Total Score Prizes</div>
+          <div class="friday-payout-grid">
+            <div class="place-chip"><div class="place">1st</div><div class="prize">$10</div></div>
+            <div class="place-chip"><div class="place">2nd</div><div class="prize">$7</div></div>
+            <div class="place-chip"><div class="place">3rd</div><div class="prize">$5</div></div>
+            <div class="place-chip"><div class="place">4th</div><div class="prize">$3</div></div>
+          </div>
+        </div>
+        <div class="total-purse" style="align-items:flex-end"><span class="purse-label">Total Purse</span><span class="purse-amount">$80</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SATURDAY -->
+  <div class="day-card" data-animate>
+    <div class="day-header">
+      <div class="day-number"><span class="num">07</span><span class="label">Day</span></div>
+      <div class="day-info">
+        <div class="day-name">Saturday</div>
+        <div class="day-meta">
+          <div class="day-meta-item"><span class="meta-label">Tee Time</span><span class="meta-value">TBD</span></div>
+          <div class="day-meta-item"><span class="meta-label">Course</span><span class="meta-value">TBD</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="day-body">
+      <div class="game-description"><strong>Match Play</strong> &mdash; Scoring same as Ryder Cup (1 up, 2 up, etc. &mdash; no points)</div>
+      <div class="saturday-note">
+        Final handicaps determine who your match is against<br>
+        <strong>Lowest 2 vs. Highest 2</strong><br><br>
+        Match players determine what <strong>($$)</strong> you're playing for.
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<script>
+  // Scroll-triggered card reveals with mobile fallback
+  try {
+    const cards = document.querySelectorAll('[data-animate]');
+    
+    if ('IntersectionObserver' in window) {
+      // Set initial hidden state via JS so cards are visible if JS fails
+      cards.forEach(el => el.classList.add('animate-ready'));
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.05, rootMargin: '0px 0px 50px 0px' });
+
+      cards.forEach(el => observer.observe(el));
+      
+      // Safety fallback: if cards still hidden after 3s, show them all
+      setTimeout(() => {
+        cards.forEach(el => el.classList.add('visible'));
+      }, 3000);
+    }
+  } catch(e) {
+    // If anything fails, ensure all cards are visible
+    document.querySelectorAll('[data-animate]').forEach(el => {
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+    });
+  }
+</script>
+</body>
+</html>
