@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Scoring — BuschLight Cup 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Firebase v9 compat (works without a build step) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<style>
+:root {
+  --green-900: #1a3a1a;
+  --green-800: #234d23;
+  --green-700: #2d6a2d;
+  --green-600: #3d8b3d;
+  --green-500: #4caf50;
+  --green-400: #66bb6a;
+  --green-300: #a5d6a7;
+  --green-200: #c8e6c9;
+  --green-100: #e8f5e9;
+  --green-50: #f1f8f1;
+  --gold: #c9a84c;
+  --gold-light: #e8d48b;
+  --gold-dark: #a08030;
+  --cream: #faf8f2;
+  --sand: #f0ead6;
+  --dark: #1a1a18;
+  --gray-800: #2d2d2a;
+  --gray-600: #5a5a55;
+  --gray-400: #8a8a85;
+  --gray-200: #d4d4cf;
+  --gray-100: #eaeae5;
+  --white: #ffffff;
+  --red-accent: #c0392b;
+  --red-light: #fce4ec;
+  --blue-accent: #2471a3;
+  --birdie-color: #e67e22;
+  --eagle-color: #c0392b;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--dark);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* === NAV === */
+.site-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 56px;
+  background: rgba(26,58,26,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.nav-brand {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-decoration: none;
+}
+
+.nav-links { display: flex; align-items: center; gap: 4px; }
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.nav-link:hover { background: rgba(255,255,255,0.1); color: var(--white); }
+.nav-link.active { background: rgba(201,168,76,0.15); color: var(--gold); }
+.nav-link svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+@media (max-width: 480px) {
+  .nav-link span { display: none; }
+  .nav-link { padding: 8px 10px; }
+  .nav-brand { font-size: 10px; letter-spacing: 2px; }
+}
+
+/* === SCREENS === */
+.screen {
+  display: none;
+  min-height: 100vh;
+  padding-top: 56px;
+}
+
+.screen.active { display: flex; flex-direction: column; }
+
+/* === LOGIN SCREEN === */
+.login-screen {
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(165deg, var(--green-900) 0%, var(--green-800) 50%, var(--green-700) 100%);
+  padding: 80px 20px 40px;
+}
+
+.login-card {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.25);
+}
+
+.login-logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-logo .cup-icon {
+  font-size: 40px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.login-logo h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--dark);
+}
+
+.login-logo p {
+  font-size: 13px;
+  color: var(--gray-400);
+  margin-top: 4px;
+}
+
+.form-group { margin-bottom: 20px; }
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--gray-600);
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--gray-200);
+  border-radius: 10px;
+  font-size: 16px;
+  font-family: inherit;
+  color: var(--dark);
+  background: var(--white);
+  transition: border-color 0.15s;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.form-input:focus { border-color: var(--green-500); }
+.form-input::placeholder { color: var(--gray-400); }
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+  outline: none;
+}
+
+.btn-primary {
+  background: var(--green-700);
+  color: var(--white);
+}
+
+.btn-primary:hover { background: var(--green-800); transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled { background: var(--gray-200); color: var(--gray-400); cursor: not-allowed; transform: none; }
+
+.btn-secondary {
+  background: var(--gray-100);
+  color: var(--dark);
+}
+
+.btn-secondary:hover { background: var(--gray-200); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--green-700);
+  font-weight: 600;
+}
+
+.btn-ghost:hover { background: var(--green-50); }
+
+.btn-sm {
+  padding: 8px 14px;
+  font-size: 13px;
+  width: auto;
+  border-radius: 8px;
+}
+
+.btn-danger {
+  background: var(--red-light);
+  color: var(--red-accent);
+}
+
+.btn-danger:hover { background: #f8bbd0; }
+
+.form-note {
+  font-size: 12px;
+  color: var(--gray-400);
+  text-align: center;
+  margin-top: 16px;
+  line-height: 1.5;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  color: var(--gray-400);
+  font-size: 12px;
+}
+
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--gray-200);
+}
+
+.alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.alert-success { background: var(--green-100); color: var(--green-800); border: 1px solid var(--green-300); }
+.alert-error { background: var(--red-light); color: var(--red-accent); border: 1px solid #f8bbd0; }
+.alert-info { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+
+/* === MAIN SCORING SCREEN === */
+.scoring-screen {
+  background: var(--cream);
+  flex-direction: column;
+}
+
+/* Tab Bar */
+.tab-bar {
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+  display: flex;
+  padding: 0 20px;
+  gap: 4px;
+  position: sticky;
+  top: 56px;
+  z-index: 100;
+}
+
+.tab-btn {
+  padding: 14px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-400);
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.tab-btn.active { color: var(--green-700); border-bottom-color: var(--green-600); }
+.tab-btn:hover:not(.active) { color: var(--dark); }
+.tab-btn svg { width: 15px; height: 15px; }
+
+/* Tab Content */
+.tab-content { display: none; flex: 1; }
+.tab-content.active { display: block; }
+
+/* User Header Bar */
+.user-bar {
+  background: var(--green-900);
+  color: var(--white);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.user-info { display: flex; flex-direction: column; gap: 2px; }
+
+.user-name {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.user-meta {
+  font-size: 12px;
+  color: var(--green-300);
+  font-family: 'DM Mono', monospace;
+}
+
+.user-actions { display: flex; gap: 8px; }
+
+/* Day Selector */
+.day-selector-section {
+  padding: 20px;
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.day-selector-section label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--gray-400);
+  margin-bottom: 8px;
+}
+
+.day-select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid var(--gray-200);
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--dark);
+  background: var(--white);
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a8a85' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 40px;
+}
+
+.day-select:focus { border-color: var(--green-500); }
+
+/* === SCORECARD ENTRY === */
+.scorecard-header {
+  padding: 16px 20px;
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.scorecard-totals {
+  display: flex;
+  gap: 20px;
+}
+
+.total-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.total-chip .tc-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--gray-400);
+}
+
+.total-chip .tc-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--dark);
+  line-height: 1;
+}
+
+.total-chip .tc-value.under { color: var(--red-accent); }
+.total-chip .tc-value.over { color: var(--blue-accent); }
+
+.holes-progress {
+  font-size: 12px;
+  color: var(--gray-400);
+  font-family: 'DM Mono', monospace;
+}
+
+/* Nine Sections */
+.nine-section { padding: 16px 12px; }
+
+.nine-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--gray-400);
+  margin-bottom: 12px;
+  padding-left: 4px;
+}
+
+/* Hole Rows */
+.hole-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 80px 80px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 4px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.hole-row:last-child { border-bottom: none; }
+
+.hole-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gray-400);
+  text-align: center;
+}
+
+.hole-par-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hole-par {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dark);
+}
+
+.hole-hcp {
+  font-size: 11px;
+  color: var(--gray-400);
+  font-family: 'DM Mono', monospace;
+}
+
+.hole-stroke-indicator {
+  font-size: 10px;
+  color: var(--gold-dark);
+  font-weight: 700;
+}
+
+/* Score Input */
+.score-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+}
+
+.score-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--gray-200);
+  background: var(--white);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gray-600);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.1s;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+  line-height: 1;
+}
+
+.score-btn:active { transform: scale(0.92); background: var(--gray-100); }
+
+.score-display {
+  min-width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--dark);
+  font-family: 'DM Mono', monospace;
+  transition: background 0.15s, color 0.15s;
+}
+
+.score-display.ace { background: #b71c1c; color: white; }
+.score-display.double-eagle { background: #880e4f; color: white; }
+.score-display.eagle { background: var(--eagle-color); color: white; }
+.score-display.birdie { background: var(--birdie-color); color: white; }
+.score-display.par { background: var(--green-200); color: var(--green-800); }
+.score-display.bogey { background: #e3f2fd; color: #1565c0; }
+.score-display.double { background: #e8eaf6; color: #283593; }
+.score-display.worse { background: var(--red-light); color: var(--red-accent); }
+
+.net-display {
+  font-size: 13px;
+  font-family: 'DM Mono', monospace;
+  color: var(--gray-400);
+  text-align: center;
+  min-width: 40px;
+}
+
+.net-display.net-birdie { color: var(--birdie-color); font-weight: 700; }
+.net-display.net-eagle { color: var(--eagle-color); font-weight: 700; }
+.net-display.net-par { color: var(--green-600); }
+.net-display.net-bogey { color: var(--blue-accent); }
+.net-display.net-worse { color: var(--red-accent); }
+
+/* Nine Subtotals */
+.nine-subtotal {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 12px 4px;
+  border-top: 2px solid var(--green-200);
+  margin-top: 4px;
+}
+
+.subtotal-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.subtotal-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--gray-400);
+  font-weight: 700;
+}
+
+.subtotal-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--dark);
+}
+
+/* Submit Bar */
+.submit-bar {
+  position: sticky;
+  bottom: 0;
+  background: var(--white);
+  border-top: 2px solid var(--green-200);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.08);
+}
+
+.submit-bar-info { font-size: 13px; color: var(--gray-400); }
+.submit-bar-info strong { color: var(--dark); }
+
+.btn-submit {
+  background: var(--green-700);
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.btn-submit:hover { background: var(--green-800); }
+.btn-submit:disabled { background: var(--gray-200); color: var(--gray-400); cursor: not-allowed; }
+
+.save-status {
+  font-size: 11px;
+  color: var(--green-600);
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.save-status.visible { opacity: 1; }
+
+/* === LEADERBOARD === */
+.leaderboard-section { padding: 16px; }
+
+.leaderboard-day-header {
+  background: var(--green-900);
+  color: var(--white);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lb-day-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.lb-format {
+  font-size: 12px;
+  color: var(--green-300);
+  font-family: 'DM Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.live-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--green-300);
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4caf50;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+/* Leaderboard Table */
+.lb-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--gray-200);
+  background: var(--white);
+}
+
+.lb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 700px;
+}
+
+.lb-table th {
+  background: var(--green-800);
+  color: var(--white);
+  padding: 10px 8px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.lb-table th:first-child { text-align: left; padding-left: 16px; min-width: 120px; position: sticky; left: 0; background: var(--green-800); }
+
+.lb-table td {
+  padding: 8px 6px;
+  text-align: center;
+  border-bottom: 1px solid var(--gray-100);
+  vertical-align: middle;
+  color: var(--gray-600);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+}
+
+.lb-table td:first-child {
+  text-align: left;
+  padding-left: 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dark);
+  position: sticky;
+  left: 0;
+  background: var(--white);
+}
+
+.lb-table tr:nth-child(even) td { background: var(--green-50); }
+.lb-table tr:nth-child(even) td:first-child { background: var(--green-50); }
+.lb-table tr:last-child td { border-bottom: none; }
+
+.lb-table tr.current-player td { background: rgba(201,168,76,0.08); }
+.lb-table tr.current-player td:first-child { background: rgba(201,168,76,0.08); }
+
+/* Score cell colors */
+.cell-eagle { color: var(--eagle-color) !important; font-weight: 700; }
+.cell-birdie { color: var(--birdie-color) !important; font-weight: 700; }
+.cell-par { color: var(--green-600); }
+.cell-bogey { color: var(--blue-accent); }
+.cell-worse { color: var(--red-accent); }
+.cell-empty { color: var(--gray-200); }
+
+.cell-total {
+  background: var(--green-900) !important;
+  color: var(--white) !important;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.cell-net {
+  background: var(--gold-dark) !important;
+  color: var(--white) !important;
+  font-weight: 700;
+}
+
+/* Leaderboard Summary Cards */
+.lb-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.lb-summary-card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 14px 16px;
+  text-align: center;
+}
+
+.lb-summary-card .lsc-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--gray-400);
+  margin-bottom: 6px;
+}
+
+.lb-summary-card .lsc-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--dark);
+  margin-bottom: 2px;
+}
+
+.lb-summary-card .lsc-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--green-700);
+}
+
+.lb-empty {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--gray-400);
+  font-size: 14px;
+}
+
+/* Loading spinner */
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--gray-200);
+  border-top-color: var(--green-600);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* === EMAIL SENT SCREEN === */
+.email-sent-screen {
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(165deg, var(--green-900), var(--green-700));
+  padding: 80px 20px 40px;
+}
+
+.email-sent-card {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 40px 36px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.25);
+}
+
+.email-icon {
+  font-size: 56px;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.email-sent-card h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--dark);
+  margin-bottom: 12px;
+}
+
+.email-sent-card p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--gray-600);
+  margin-bottom: 16px;
+}
+
+.email-highlight {
+  background: var(--green-50);
+  border: 1px solid var(--green-200);
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--green-800);
+  margin: 16px 0;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 600px) {
+  .hole-row { grid-template-columns: 28px 1fr 72px 56px; gap: 6px; }
+  .login-card { padding: 28px 20px; }
+  .scorecard-totals { gap: 12px; }
+  .total-chip .tc-value { font-size: 18px; }
+  .lb-summary-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="site-nav">
+  <a href="index.html" class="nav-brand">BuschLight Cup</a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Schedule</span>
+    </a>
+    <a href="instructions.html" class="nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <span>Rules</span>
+    </a>
+    <a href="scoring.html" class="nav-link active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>Live Scores</span>
+    </a>
+  </div>
+</nav>
+
+<!-- SCREEN: Login -->
+<div id="screen-login" class="screen login-screen active">
+  <div class="login-card">
+    <div class="login-logo">
+      <span class="cup-icon">🏆</span>
+      <h2>Live Scoring</h2>
+      <p>BuschLight Cup 2026</p>
+    </div>
+    <div id="login-alert"></div>
+    <div class="form-group">
+      <label class="form-label" for="login-email">Your Email Address</label>
+      <input type="email" id="login-email" class="form-input" placeholder="you@example.com" autocomplete="email" inputmode="email">
+    </div>
+    <button class="btn btn-primary" id="btn-send-link" onclick="sendLoginLink()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Send Sign-in Link
+    </button>
+    <p class="form-note">We'll email you a magic link. Click it on your phone to sign in — no password needed. Your device will remember you.</p>
+    <div class="divider">or view without signing in</div>
+    <button class="btn btn-secondary" onclick="viewLeaderboardOnly()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      View Live Scorecard
+    </button>
+  </div>
+</div>
+
+<!-- SCREEN: Email Sent -->
+<div id="screen-email-sent" class="screen email-sent-screen">
+  <div class="email-sent-card">
+    <span class="email-icon">📧</span>
+    <h2>Check Your Email</h2>
+    <p>We sent a sign-in link to:</p>
+    <div class="email-highlight" id="sent-email-display">—</div>
+    <p>Open the link in this browser on your phone. It will sign you in automatically and save your device for future visits.</p>
+    <button class="btn btn-secondary" style="margin-top:8px" onclick="showScreen('screen-login')">Use a different email</button>
+    <p class="form-note" style="margin-top:16px">Didn't get it? Check your spam folder or try again.</p>
+  </div>
+</div>
+
+<!-- SCREEN: Main App (after login) -->
+<div id="screen-app" class="screen scoring-screen">
+
+  <!-- User Header -->
+  <div class="user-bar">
+    <div class="user-info">
+      <div class="user-name" id="user-display-name">Loading...</div>
+      <div class="user-meta" id="user-handicap-display">Handicap: —</div>
+    </div>
+    <div class="user-actions">
+      <button class="btn btn-ghost btn-sm" onclick="signOut()" style="color:rgba(255,255,255,0.6);font-size:12px">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- Day Selector -->
+  <div class="day-selector-section">
+    <label for="day-select">Select Day</label>
+    <select id="day-select" class="day-select" onchange="onDayChange()">
+      <option value="">— Choose a day —</option>
+      <option value="1">Day 1 — Sunday · Lake Marion</option>
+      <option value="2">Day 2 — Monday · Santee Cooper</option>
+      <option value="3">Day 3 — Tuesday · Wyboo</option>
+      <option value="4">Day 4 — Wednesday · Santee National</option>
+      <option value="5">Day 5 — Thursday · Players Course</option>
+      <option value="6">Day 6 — Friday · Lake Marion</option>
+      <option value="7">Day 7 — Saturday · TBD</option>
+    </select>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tab-scorecard" onclick="switchTab('scorecard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="3"/></svg>
+      Enter Scores
+    </button>
+    <button class="tab-btn" id="tab-leaderboard" onclick="switchTab('leaderboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Live Scorecard
+    </button>
+  </div>
+
+  <!-- Tab: Enter Scores -->
+  <div id="content-scorecard" class="tab-content active">
+    <!-- Header Totals -->
+    <div class="scorecard-header">
+      <div class="scorecard-totals">
+        <div class="total-chip">
+          <span class="tc-label">Gross</span>
+          <span class="tc-value" id="total-gross">—</span>
+        </div>
+        <div class="total-chip">
+          <span class="tc-label">Net</span>
+          <span class="tc-value" id="total-net">—</span>
+        </div>
+        <div class="total-chip">
+          <span class="tc-label">Pts</span>
+          <span class="tc-value" id="total-pts">—</span>
+        </div>
+      </div>
+      <div>
+        <div class="holes-progress" id="holes-progress">0 / 18 holes</div>
+        <div class="save-status" id="save-status">Saved ✓</div>
+      </div>
+    </div>
+
+    <!-- Front 9 -->
+    <div class="nine-section">
+      <div class="nine-label">Front Nine</div>
+      <div id="holes-front"></div>
+      <div class="nine-subtotal">
+        <div class="subtotal-item"><span class="subtotal-label">Gross</span><span class="subtotal-value" id="front-gross">—</span></div>
+        <div class="subtotal-item"><span class="subtotal-label">Net</span><span class="subtotal-value" id="front-net">—</span></div>
+        <div class="subtotal-item"><span class="subtotal-label">Pts</span><span class="subtotal-value" id="front-pts">—</span></div>
+      </div>
+    </div>
+
+    <!-- Back 9 -->
+    <div class="nine-section" style="border-top:1px solid var(--gray-200)">
+      <div class="nine-label">Back Nine</div>
+      <div id="holes-back"></div>
+      <div class="nine-subtotal">
+        <div class="subtotal-item"><span class="subtotal-label">Gross</span><span class="subtotal-value" id="back-gross">—</span></div>
+        <div class="subtotal-item"><span class="subtotal-label">Net</span><span class="subtotal-value" id="back-net">—</span></div>
+        <div class="subtotal-item"><span class="subtotal-label">Pts</span><span class="subtotal-value" id="back-pts">—</span></div>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="submit-bar">
+      <div class="submit-bar-info">
+        <strong id="submit-holes-done">0</strong> of 18 holes entered
+      </div>
+      <button class="btn-submit" id="btn-save-score" onclick="saveScore()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Save Score
+      </button>
+    </div>
+  </div>
+
+  <!-- Tab: Leaderboard -->
+  <div id="content-leaderboard" class="tab-content">
+    <div class="leaderboard-section">
+      <div id="lb-content">
+        <div class="lb-empty">
+          <div class="spinner" style="margin:0 auto 12px"></div>
+          Select a day above to view the live scorecard
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: Leaderboard Only (no auth) -->
+<div id="screen-leaderboard-only" class="screen scoring-screen">
+  <div class="user-bar" style="justify-content:space-between">
+    <div>
+      <div class="user-name">Live Scorecard</div>
+      <div class="user-meta">View only — <a href="scoring.html" style="color:var(--gold)">Sign in to enter scores</a></div>
+    </div>
+  </div>
+  <div class="day-selector-section">
+    <label for="day-select-lo">Select Day</label>
+    <select id="day-select-lo" class="day-select" onchange="onDayChangeLeaderboardOnly()">
+      <option value="">— Choose a day —</option>
+      <option value="1">Day 1 — Sunday · Lake Marion</option>
+      <option value="2">Day 2 — Monday · Santee Cooper</option>
+      <option value="3">Day 3 — Tuesday · Wyboo</option>
+      <option value="4">Day 4 — Wednesday · Santee National</option>
+      <option value="5">Day 5 — Thursday · Players Course</option>
+      <option value="6">Day 6 — Friday · Lake Marion</option>
+      <option value="7">Day 7 — Saturday · TBD</option>
+    </select>
+  </div>
+  <div style="padding:16px" id="lb-content-only">
+    <div class="lb-empty">Select a day to view scores</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+// ──────────────────────────────────────────────
+// Firebase Init
+// ──────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyC1soSELTncOWIeGa_oMJoWqTU7yKS1RHA",
+  authDomain: "buschlightcup.firebaseapp.com",
+  projectId: "buschlightcup",
+  storageBucket: "buschlightcup.firebasestorage.app",
+  messagingSenderId: "944255498477",
+  appId: "1:944255498477:web:4ffea8e79b6ca1e00fb4e4"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// ──────────────────────────────────────────────
+// Course / Game Data
+// ──────────────────────────────────────────────
+const YEAR = 2026;
+
+const DAYS = {
+  1: { name: 'Sunday', course: 'Lake Marion', format: '123 Ball', teeTime: '8:36 AM' },
+  2: { name: 'Monday', course: 'Santee Cooper', format: '2 Man 1 Best Ball', teeTime: '8:36 AM' },
+  3: { name: 'Tuesday', course: 'Wyboo', format: '4 Man Team Chicago', teeTime: '9:00 AM' },
+  4: { name: 'Wednesday', course: 'Santee National', format: '4 Man 2 Best Balls', teeTime: '8:30 AM' },
+  5: { name: 'Thursday', course: 'Players Course', format: '4 Man Designated Hole + 1 Best', teeTime: '9:00 AM' },
+  6: { name: 'Friday', course: 'Lake Marion', format: 'Individual Chicago', teeTime: '9:16 AM' },
+  7: { name: 'Saturday', course: 'TBD', format: 'Match Play', teeTime: 'TBD' }
+};
+
+// Standard par layout (can be updated per course by admin)
+// Format: [hole1, hole2, ..., hole18]
+const DEFAULT_PARS = [4,4,3,5,4,3,4,5,4, 4,3,5,4,4,3,5,4,4];
+
+// Hole difficulty rankings 1=hardest, 18=easiest (standard USGA allocation)
+const DEFAULT_HCP_ORDER = [1,5,9,13,3,15,7,11,17, 2,6,10,14,4,16,8,12,18];
+
+// ──────────────────────────────────────────────
+// App State
+// ──────────────────────────────────────────────
+let currentUser = null;
+let currentPlayerData = null;
+let currentDay = null;
+let scores = new Array(18).fill(0); // 0 = not entered
+let lbUnsubscribe = null;
+let lbOnlyUnsubscribe = null;
+let courseData = { pars: DEFAULT_PARS, hcpOrder: DEFAULT_HCP_ORDER };
+
+// ──────────────────────────────────────────────
+// Screen Management
+// ──────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ──────────────────────────────────────────────
+// Firebase Auth — Email Link
+// ──────────────────────────────────────────────
+async function sendLoginLink() {
+  const email = document.getElementById('login-email').value.trim();
+  const alertEl = document.getElementById('login-alert');
+
+  if (!email || !email.includes('@')) {
+    alertEl.innerHTML = '<div class="alert alert-error">Please enter a valid email address.</div>';
+    return;
+  }
+
+  const btn = document.getElementById('btn-send-link');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px"></span> Sending...';
+  alertEl.innerHTML = '';
+
+  const actionCodeSettings = {
+    url: window.location.href, // redirect back to this page
+    handleCodeInApp: true
+  };
+
+  try {
+    await auth.sendSignInLinkToEmail(email, actionCodeSettings);
+    localStorage.setItem('emailForSignIn', email);
+    document.getElementById('sent-email-display').textContent = email;
+    showScreen('screen-email-sent');
+  } catch (err) {
+    console.error(err);
+    let msg = 'Something went wrong. Please try again.';
+    if (err.code === 'auth/invalid-email') msg = 'That email address doesn\'t look right.';
+    if (err.code === 'auth/too-many-requests') msg = 'Too many attempts. Please wait a moment and try again.';
+    alertEl.innerHTML = `<div class="alert alert-error">${msg}</div>`;
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Sign-in Link';
+  }
+}
+
+async function handleEmailLinkSignIn() {
+  if (!auth.isSignInWithEmailLink(window.location.href)) return false;
+
+  let email = localStorage.getItem('emailForSignIn');
+  if (!email) {
+    email = window.prompt('Please enter the email you used to sign in:');
+    if (!email) return false;
+  }
+
+  try {
+    const result = await auth.signInWithEmailLink(email, window.location.href);
+    localStorage.removeItem('emailForSignIn');
+    // Clean URL
+    window.history.replaceState({}, document.title, window.location.pathname);
+    return true;
+  } catch (err) {
+    console.error('Email link sign in error:', err);
+    document.getElementById('login-alert').innerHTML =
+      '<div class="alert alert-error">Sign-in link is invalid or expired. Please request a new one.</div>';
+    showScreen('screen-login');
+    return false;
+  }
+}
+
+function viewLeaderboardOnly() {
+  showScreen('screen-leaderboard-only');
+}
+
+async function signOut() {
+  if (lbUnsubscribe) lbUnsubscribe();
+  await auth.signOut();
+  showScreen('screen-login');
+}
+
+// ──────────────────────────────────────────────
+// Auth State Observer
+// ──────────────────────────────────────────────
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    currentUser = user;
+    await loadPlayerData(user);
+    showScreen('screen-app');
+    buildScorecardUI();
+    // Auto-select today's day if we can
+    tryAutoSelectDay();
+  } else {
+    // Check for email link in URL
+    const handled = await handleEmailLinkSignIn();
+    if (!handled) {
+      showScreen('screen-login');
+    }
+  }
+});
+
+// ──────────────────────────────────────────────
+// Player Data
+// ──────────────────────────────────────────────
+async function loadPlayerData(user) {
+  try {
+    const doc = await db.collection('players').doc(user.uid).get();
+    if (doc.exists) {
+      currentPlayerData = doc.data();
+    } else {
+      // First time — create player record from email
+      const name = user.displayName || user.email.split('@')[0];
+      currentPlayerData = { name, email: user.email, handicap: 0, active: true };
+      await db.collection('players').doc(user.uid).set({
+        ...currentPlayerData,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+    document.getElementById('user-display-name').textContent = currentPlayerData.name;
+    document.getElementById('user-handicap-display').textContent =
+      `Handicap: ${currentPlayerData.handicap || 0}`;
+  } catch (err) {
+    console.error('Error loading player data:', err);
+    currentPlayerData = { name: user.email, handicap: 0 };
+    document.getElementById('user-display-name').textContent = user.email;
+    document.getElementById('user-handicap-display').textContent = 'Handicap: 0';
+  }
+}
+
+// ──────────────────────────────────────────────
+// Auto-select current day
+// ──────────────────────────────────────────────
+function tryAutoSelectDay() {
+  // Trip runs Sun Apr 19 – Sat Apr 25, 2026 (adjust dates here)
+  const TRIP_DATES = [
+    '2026-04-19', // Day 1 Sunday
+    '2026-04-20', // Day 2 Monday
+    '2026-04-21', // Day 3 Tuesday
+    '2026-04-22', // Day 4 Wednesday
+    '2026-04-23', // Day 5 Thursday
+    '2026-04-24', // Day 6 Friday
+    '2026-04-25', // Day 7 Saturday
+  ];
+  const today = new Date().toISOString().slice(0, 10);
+  const dayIdx = TRIP_DATES.indexOf(today);
+  if (dayIdx >= 0) {
+    const dayNum = dayIdx + 1;
+    document.getElementById('day-select').value = String(dayNum);
+    onDayChange();
+  }
+}
+
+// ──────────────────────────────────────────────
+// Tab Switching
+// ──────────────────────────────────────────────
+function switchTab(tab) {
+  ['scorecard', 'leaderboard'].forEach(t => {
+    document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
+    document.getElementById(`content-${t}`).classList.toggle('active', t === tab);
+  });
+
+  if (tab === 'leaderboard' && currentDay) {
+    loadLeaderboard(currentDay, 'lb-content', currentUser ? currentUser.uid : null);
+  }
+}
+
+// ──────────────────────────────────────────────
+// Day Change
+// ──────────────────────────────────────────────
+function onDayChange() {
+  const val = document.getElementById('day-select').value;
+  currentDay = val ? parseInt(val) : null;
+  scores = new Array(18).fill(0);
+
+  if (currentDay) {
+    loadCourseData(currentDay).then(() => {
+      buildScorecardUI();
+      loadExistingScores();
+    });
+    if (document.getElementById('content-leaderboard').classList.contains('active')) {
+      loadLeaderboard(currentDay, 'lb-content', currentUser ? currentUser.uid : null);
+    }
+  }
+}
+
+function onDayChangeLeaderboardOnly() {
+  const val = document.getElementById('day-select-lo').value;
+  const day = val ? parseInt(val) : null;
+  if (day) {
+    loadLeaderboard(day, 'lb-content-only', null);
+  }
+}
+
+// ──────────────────────────────────────────────
+// Course Data (from Firestore or defaults)
+// ──────────────────────────────────────────────
+async function loadCourseData(dayNum) {
+  try {
+    const doc = await db.collection('courses').doc(`${YEAR}_day${dayNum}`).get();
+    if (doc.exists) {
+      const d = doc.data();
+      courseData.pars = d.pars || DEFAULT_PARS;
+      courseData.hcpOrder = d.hcpOrder || DEFAULT_HCP_ORDER;
+    } else {
+      courseData = { pars: DEFAULT_PARS, hcpOrder: DEFAULT_HCP_ORDER };
+    }
+  } catch {
+    courseData = { pars: DEFAULT_PARS, hcpOrder: DEFAULT_HCP_ORDER };
+  }
+}
+
+// ──────────────────────────────────────────────
+// Handicap Stroke Calculation
+// ──────────────────────────────────────────────
+function strokesOnHole(holeIndex, courseHandicap) {
+  // How many extra strokes does this player get on this hole?
+  const hcpRank = courseData.hcpOrder[holeIndex]; // 1=hardest
+  const fullStrokes = Math.floor(courseHandicap / 18);
+  const extra = courseHandicap % 18;
+  return fullStrokes + (hcpRank <= extra ? 1 : 0);
+}
+
+function getCourseHandicap() {
+  // Simplified: use handicap index as course handicap
+  // (admin can set slope/rating per course for more accuracy)
+  return Math.round(currentPlayerData ? (currentPlayerData.handicap || 0) : 0);
+}
+
+// ──────────────────────────────────────────────
+// Chicago Points
+// ──────────────────────────────────────────────
+function chicagoPoints(grossScore, par) {
+  const diff = grossScore - par;
+  if (diff <= -3) return 5; // double eagle or better
+  if (diff === -2) return 4; // eagle
+  if (diff === -1) return 3; // birdie
+  if (diff === 0)  return 2; // par
+  if (diff === 1)  return 1; // bogey
+  return 0;                  // double bogey or worse
+}
+
+function quotaFromHandicap(hcp) {
+  return 36 - Math.round(hcp);
+}
+
+// ──────────────────────────────────────────────
+// Score Class (for color coding)
+// ──────────────────────────────────────────────
+function scoreClass(gross, par) {
+  if (!gross) return '';
+  const d = gross - par;
+  if (gross === 1) return 'ace';
+  if (d <= -3) return 'double-eagle';
+  if (d === -2) return 'eagle';
+  if (d === -1) return 'birdie';
+  if (d === 0)  return 'par';
+  if (d === 1)  return 'bogey';
+  if (d === 2)  return 'double';
+  return 'worse';
+}
+
+function netScoreClass(net, par) {
+  if (!net) return '';
+  const d = net - par;
+  if (d <= -2) return 'net-eagle';
+  if (d === -1) return 'net-birdie';
+  if (d === 0)  return 'net-par';
+  if (d === 1)  return 'net-bogey';
+  return 'net-worse';
+}
+
+// ──────────────────────────────────────────────
+// Build Scorecard UI
+// ──────────────────────────────────────────────
+function buildScorecardUI() {
+  renderHoleRows('holes-front', 0, 9);
+  renderHoleRows('holes-back', 9, 18);
+  updateTotals();
+}
+
+function renderHoleRows(containerId, startIdx, endIdx) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  const ch = getCourseHandicap();
+
+  for (let i = startIdx; i < endIdx; i++) {
+    const par = courseData.pars[i];
+    const strokes = strokesOnHole(i, ch);
+    const hcpRank = courseData.hcpOrder[i];
+
+    const row = document.createElement('div');
+    row.className = 'hole-row';
+    row.dataset.hole = i;
+
+    row.innerHTML = `
+      <div class="hole-num">${i + 1}</div>
+      <div class="hole-par-info">
+        <div class="hole-par">Par ${par}</div>
+        <div class="hole-hcp">HCP ${hcpRank}${strokes > 0 ? ` <span class="hole-stroke-indicator">+${strokes} stroke${strokes>1?'s':''}</span>` : ''}</div>
+      </div>
+      <div class="score-input-wrap">
+        <button class="score-btn" ontouchstart="adjustScore(${i}, -1)" onclick="adjustScore(${i}, -1)">−</button>
+        <div class="score-display ${scoreClass(scores[i], par)}" id="score-disp-${i}">${scores[i] || '—'}</div>
+        <button class="score-btn" ontouchstart="adjustScore(${i}, 1)" onclick="adjustScore(${i}, 1)">+</button>
+      </div>
+      <div class="net-display ${scores[i] ? netScoreClass(scores[i] - strokes, par) : ''}" id="net-disp-${i}">
+        ${scores[i] ? (scores[i] - strokes) : '—'}
+      </div>
+    `;
+
+    container.appendChild(row);
+  }
+}
+
+function adjustScore(holeIdx, delta) {
+  const par = courseData.pars[holeIdx];
+  const ch = getCourseHandicap();
+  const strokes = strokesOnHole(holeIdx, ch);
+  const current = scores[holeIdx] || 0;
+
+  // Min score = 1, max = par + 10
+  const newScore = Math.max(1, Math.min(par + 10, current + delta));
+
+  // If currently 0 and going down, set to par
+  scores[holeIdx] = (current === 0 && delta < 0) ? par : (current === 0 && delta > 0) ? par + 1 : newScore;
+
+  // If was at 1 and trying to go lower, reset to 0
+  if (current === 1 && delta === -1) scores[holeIdx] = 0;
+
+  // Update display
+  const disp = document.getElementById(`score-disp-${holeIdx}`);
+  const netDisp = document.getElementById(`net-disp-${holeIdx}`);
+
+  disp.textContent = scores[holeIdx] || '—';
+  disp.className = `score-display ${scoreClass(scores[holeIdx], par)}`;
+
+  const net = scores[holeIdx] ? scores[holeIdx] - strokes : 0;
+  netDisp.textContent = scores[holeIdx] ? net : '—';
+  netDisp.className = `net-display ${scores[holeIdx] ? netScoreClass(net, par) : ''}`;
+
+  updateTotals();
+  autoSave();
+}
+
+function updateTotals() {
+  const ch = getCourseHandicap();
+  let frontGross = 0, frontNet = 0, frontPts = 0;
+  let backGross = 0, backNet = 0, backPts = 0;
+  let frontHoles = 0, backHoles = 0;
+
+  for (let i = 0; i < 18; i++) {
+    const g = scores[i];
+    if (!g) continue;
+    const par = courseData.pars[i];
+    const strokes = strokesOnHole(i, ch);
+    const net = g - strokes;
+    const pts = chicagoPoints(g, par);
+
+    if (i < 9) {
+      frontGross += g; frontNet += net; frontPts += pts; frontHoles++;
+    } else {
+      backGross += g; backNet += net; backPts += pts; backHoles++;
+    }
+  }
+
+  const totalHoles = frontHoles + backHoles;
+  const totalGross = frontGross + backGross;
+  const totalNet = frontNet + backNet;
+  const totalPts = frontPts + backPts;
+
+  const quota = quotaFromHandicap(ch);
+
+  setText('total-gross', totalHoles ? totalGross : '—');
+  setText('total-net', totalHoles ? totalNet : '—');
+  setText('total-pts', totalHoles ? `${totalPts > quota ? '+' : ''}${totalPts - quota}` : '—');
+
+  setText('front-gross', frontHoles ? frontGross : '—');
+  setText('front-net', frontHoles ? frontNet : '—');
+  setText('front-pts', frontHoles ? frontPts : '—');
+
+  setText('back-gross', backHoles ? backGross : '—');
+  setText('back-net', backHoles ? backNet : '—');
+  setText('back-pts', backHoles ? backPts : '—');
+
+  setText('holes-progress', `${totalHoles} / 18 holes`);
+  setText('submit-holes-done', totalHoles);
+
+  document.getElementById('btn-save-score').disabled = totalHoles === 0;
+}
+
+function setText(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+// ──────────────────────────────────────────────
+// Auto-save (debounced)
+// ──────────────────────────────────────────────
+let autoSaveTimer = null;
+
+function autoSave() {
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(() => {
+    if (currentUser && currentDay) saveScore(true);
+  }, 1500);
+}
+
+async function saveScore(silent = false) {
+  if (!currentUser || !currentDay) return;
+
+  const ch = getCourseHandicap();
+  let grossTotal = 0, netTotal = 0, ptsTotal = 0, holesCompleted = 0;
+
+  for (let i = 0; i < 18; i++) {
+    const g = scores[i];
+    if (!g) continue;
+    const par = courseData.pars[i];
+    const strokes = strokesOnHole(i, ch);
+    grossTotal += g;
+    netTotal += g - strokes;
+    ptsTotal += chicagoPoints(g, par);
+    holesCompleted++;
+  }
+
+  const docId = `${YEAR}_day${currentDay}_${currentUser.uid}`;
+  const data = {
+    uid: currentUser.uid,
+    playerName: currentPlayerData.name,
+    email: currentUser.email,
+    year: YEAR,
+    dayNumber: currentDay,
+    dayName: DAYS[currentDay].name,
+    holes: scores,
+    handicap: ch,
+    grossTotal,
+    netTotal,
+    chicagoPoints: ptsTotal,
+    chicagoScore: ptsTotal - quotaFromHandicap(ch),
+    holesCompleted,
+    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  try {
+    await db.collection('scores').doc(docId).set(data, { merge: true });
+    if (!silent) {
+      showSaveStatus();
+    } else {
+      showSaveStatus();
+    }
+  } catch (err) {
+    console.error('Save error:', err);
+    if (!silent) alert('Error saving score. Check your connection.');
+  }
+}
+
+function showSaveStatus() {
+  const el = document.getElementById('save-status');
+  el.classList.add('visible');
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => el.classList.remove('visible'), 2000);
+}
+
+// ──────────────────────────────────────────────
+// Load Existing Scores
+// ──────────────────────────────────────────────
+async function loadExistingScores() {
+  if (!currentUser || !currentDay) return;
+  const docId = `${YEAR}_day${currentDay}_${currentUser.uid}`;
+  try {
+    const doc = await db.collection('scores').doc(docId).get();
+    if (doc.exists) {
+      const data = doc.data();
+      if (data.holes && data.holes.length === 18) {
+        scores = data.holes;
+        buildScorecardUI();
+      }
+    }
+  } catch (err) {
+    console.error('Error loading scores:', err);
+  }
+}
+
+// ──────────────────────────────────────────────
+// Leaderboard
+// ──────────────────────────────────────────────
+function loadLeaderboard(dayNum, containerId, myUid) {
+  // Unsubscribe previous listener
+  if (containerId === 'lb-content' && lbUnsubscribe) lbUnsubscribe();
+  if (containerId === 'lb-content-only' && lbOnlyUnsubscribe) lbOnlyUnsubscribe();
+
+  const container = document.getElementById(containerId);
+  container.innerHTML = `
+    <div class="lb-empty">
+      <div class="spinner" style="margin:0 auto 12px"></div>
+      Loading scores...
+    </div>`;
+
+  const unsub = db.collection('scores')
+    .where('year', '==', YEAR)
+    .where('dayNumber', '==', dayNum)
+    .onSnapshot(snap => {
+      const allScores = [];
+      snap.forEach(doc => allScores.push(doc.data()));
+      renderLeaderboard(allScores, dayNum, container, myUid);
+    }, err => {
+      console.error('Leaderboard error:', err);
+      container.innerHTML = '<div class="lb-empty">Error loading scores. Check connection.</div>';
+    });
+
+  if (containerId === 'lb-content') lbUnsubscribe = unsub;
+  else lbOnlyUnsubscribe = unsub;
+}
+
+function renderLeaderboard(allScores, dayNum, container, myUid) {
+  const day = DAYS[dayNum];
+
+  if (!allScores.length) {
+    container.innerHTML = `
+      <div class="leaderboard-day-header">
+        <div><div class="lb-day-name">${day.name}</div><div class="lb-format">${day.format}</div></div>
+        <div class="live-badge"><div class="live-dot"></div> Live</div>
+      </div>
+      <div class="lb-empty">No scores submitted yet for ${day.name}.<br>Be the first to enter your score!</div>`;
+    return;
+  }
+
+  // Sort by holesCompleted desc, then netTotal asc
+  allScores.sort((a, b) => {
+    if (b.holesCompleted !== a.holesCompleted) return b.holesCompleted - a.holesCompleted;
+    return a.netTotal - b.netTotal;
+  });
+
+  let html = `
+    <div class="leaderboard-day-header">
+      <div><div class="lb-day-name">${day.name} — ${day.course}</div><div class="lb-format">${day.format}</div></div>
+      <div class="live-badge"><div class="live-dot"></div> Live</div>
+    </div>
+    <div class="lb-table-wrap">
+      <table class="lb-table">
+        <thead>
+          <tr>
+            <th>Player</th>`;
+
+  for (let h = 1; h <= 18; h++) html += `<th>${h}</th>`;
+  html += `<th>Gross</th><th>Net</th><th>Pts</th></tr></thead><tbody>`;
+
+  allScores.forEach(s => {
+    const isMe = myUid && s.uid === myUid;
+    html += `<tr class="${isMe ? 'current-player' : ''}">`;
+    html += `<td>${s.playerName}${isMe ? ' ★' : ''}</td>`;
+
+    for (let i = 0; i < 18; i++) {
+      const g = s.holes && s.holes[i];
+      const par = DEFAULT_PARS[i];
+      if (!g) {
+        html += `<td class="cell-empty">·</td>`;
+      } else {
+        const d = g - par;
+        let cls = '';
+        if (d <= -2) cls = 'cell-eagle';
+        else if (d === -1) cls = 'cell-birdie';
+        else if (d === 0) cls = 'cell-par';
+        else if (d === 1) cls = 'cell-bogey';
+        else cls = 'cell-worse';
+        html += `<td class="${cls}">${g}</td>`;
+      }
+    }
+
+    const gross = s.holesCompleted ? s.grossTotal : '—';
+    const net = s.holesCompleted ? s.netTotal : '—';
+    const pts = s.holesCompleted ? (s.chicagoScore >= 0 ? '+' + s.chicagoScore : s.chicagoScore) : '—';
+
+    html += `<td class="cell-total">${gross}</td>`;
+    html += `<td class="cell-net">${net}</td>`;
+    html += `<td>${pts}</td>`;
+    html += '</tr>';
+  });
+
+  html += '</tbody></table></div>';
+
+  // Summary cards (leaders in each category)
+  const withScores = allScores.filter(s => s.holesCompleted > 0);
+  if (withScores.length > 0) {
+    const lowGross = withScores.reduce((a, b) => a.grossTotal < b.grossTotal ? a : b);
+    const lowNet = withScores.reduce((a, b) => a.netTotal < b.netTotal ? a : b);
+    const hiChicago = withScores.reduce((a, b) => (a.chicagoScore||0) > (b.chicagoScore||0) ? a : b);
+
+    html += `
+      <div class="lb-summary-grid" style="margin-top:16px">
+        <div class="lb-summary-card">
+          <div class="lsc-label">Low Gross</div>
+          <div class="lsc-name">${lowGross.playerName}</div>
+          <div class="lsc-value">${lowGross.grossTotal}</div>
+        </div>
+        <div class="lb-summary-card">
+          <div class="lsc-label">Low Net</div>
+          <div class="lsc-name">${lowNet.playerName}</div>
+          <div class="lsc-value">${lowNet.netTotal}</div>
+        </div>
+        <div class="lb-summary-card">
+          <div class="lsc-label">Chicago Leader</div>
+          <div class="lsc-name">${hiChicago.playerName}</div>
+          <div class="lsc-value">${hiChicago.chicagoScore >= 0 ? '+' : ''}${hiChicago.chicagoScore}</div>
+        </div>
+        <div class="lb-summary-card">
+          <div class="lsc-label">Players In</div>
+          <div class="lsc-name">&nbsp;</div>
+          <div class="lsc-value">${withScores.length} / 8</div>
+        </div>
+      </div>`;
+  }
+
+  container.innerHTML = html;
+}
+</script>
+</body>
+</html>

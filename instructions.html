@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Rules — BuschLight Cup 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-900: #1a3a1a;
+    --green-800: #234d23;
+    --green-700: #2d6a2d;
+    --green-600: #3d8b3d;
+    --green-500: #4caf50;
+    --green-400: #66bb6a;
+    --green-300: #a5d6a7;
+    --green-200: #c8e6c9;
+    --green-100: #e8f5e9;
+    --green-50: #f1f8f1;
+    --gold: #c9a84c;
+    --gold-light: #e8d48b;
+    --gold-dark: #a08030;
+    --cream: #faf8f2;
+    --sand: #f0ead6;
+    --dark: #1a1a18;
+    --gray-800: #2d2d2a;
+    --gray-600: #5a5a55;
+    --gray-400: #8a8a85;
+    --gray-200: #d4d4cf;
+    --gray-100: #eaeae5;
+    --white: #ffffff;
+    --red-accent: #c0392b;
+    --blue-accent: #2471a3;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--dark);
+    overflow-x: hidden;
+  }
+
+  /* === NAV === */
+  .site-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    height: 56px;
+    background: rgba(26, 58, 26, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .nav-brand {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.75);
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .nav-link:hover { background: rgba(255,255,255,0.1); color: var(--white); }
+  .nav-link.active { background: rgba(201,168,76,0.15); color: var(--gold); }
+  .nav-link svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  @media (max-width: 480px) {
+    .nav-link span { display: none; }
+    .nav-link { padding: 8px 10px; }
+    .nav-brand { font-size: 10px; letter-spacing: 2px; }
+  }
+
+  /* === PAGE HEADER === */
+  .page-header {
+    background: linear-gradient(165deg, var(--green-900) 0%, var(--green-800) 60%, var(--green-700) 100%);
+    padding: 96px 20px 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  .page-header-inner { position: relative; z-index: 2; }
+
+  .page-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-weight: 900;
+    color: var(--white);
+    margin-bottom: 12px;
+    line-height: 1.1;
+  }
+
+  .page-title em { font-style: italic; color: var(--gold); }
+
+  .page-subtitle {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--green-300);
+  }
+
+  /* === LAYOUT === */
+  .content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 20px 100px;
+  }
+
+  /* === SECTION HEADERS === */
+  .section-header {
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--green-200);
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--green-600);
+    margin-bottom: 6px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 3.5vw, 2rem);
+    font-weight: 700;
+    color: var(--dark);
+  }
+
+  /* === GENERAL RULES CARDS === */
+  .rules-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 60px;
+  }
+
+  .rule-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .rule-card.full-width { grid-column: 1 / -1; }
+  .rule-card.gold-border { border-color: var(--gold); background: var(--sand); }
+
+  .rule-card h4 {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--green-700);
+    margin-bottom: 8px;
+  }
+
+  .rule-card p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--gray-600);
+  }
+
+  .rule-card ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 8px;
+  }
+
+  .rule-card ul li {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--gray-600);
+    padding: 4px 0;
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .rule-card ul li::before {
+    content: '·';
+    position: absolute;
+    left: 4px;
+    color: var(--green-500);
+    font-weight: 700;
+  }
+
+  /* === BUSCH CUP POINTS TABLE === */
+  .points-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 13px;
+  }
+
+  .points-table th {
+    background: var(--green-700);
+    color: var(--white);
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .points-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--gray-100);
+    color: var(--gray-600);
+  }
+
+  .points-table tr:last-child td { border-bottom: none; }
+  .points-table tr:nth-child(even) td { background: var(--green-50); }
+
+  .pts-badge {
+    display: inline-block;
+    background: var(--green-100);
+    color: var(--green-700);
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  /* === DAY FORMAT CARDS === */
+  .day-formats { display: flex; flex-direction: column; gap: 40px; }
+
+  .format-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05);
+  }
+
+  .format-header {
+    display: flex;
+    align-items: stretch;
+    background: var(--green-900);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .format-header::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 60%, rgba(201,168,76,0.08) 100%);
+    pointer-events: none;
+  }
+
+  .format-day-num {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 88px;
+    padding: 20px;
+    background: rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 1;
+  }
+
+  .format-day-num .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .format-day-num .lbl {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--green-300);
+    margin-top: 4px;
+  }
+
+  .format-header-info {
+    flex: 1;
+    padding: 20px 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .format-day-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+
+  .format-name {
+    font-size: 13px;
+    color: var(--gold);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .format-course {
+    font-size: 12px;
+    color: var(--green-300);
+    margin-top: 4px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .format-body { padding: 28px; }
+
+  .format-body h5 {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--green-600);
+    margin-bottom: 10px;
+  }
+
+  .format-body p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--gray-600);
+    margin-bottom: 16px;
+  }
+
+  .format-body p:last-child { margin-bottom: 0; }
+
+  .how-it-works {
+    background: var(--green-50);
+    border: 1px solid var(--green-200);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+  }
+
+  .how-it-works h5 { color: var(--green-700); margin-bottom: 8px; }
+
+  .step-list {
+    list-style: none;
+    padding: 0;
+    counter-reset: steps;
+  }
+
+  .step-list li {
+    counter-increment: steps;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--gray-600);
+    padding: 6px 0 6px 32px;
+    position: relative;
+    border-bottom: 1px solid var(--green-100);
+  }
+
+  .step-list li:last-child { border-bottom: none; }
+
+  .step-list li::before {
+    content: counter(steps);
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 20px;
+    height: 20px;
+    background: var(--green-600);
+    color: white;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    text-align: center;
+    padding: 0;
+  }
+
+  .chicago-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 8px;
+  }
+
+  .chicago-table th {
+    background: var(--green-700);
+    color: white;
+    padding: 8px 12px;
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .chicago-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--gray-100);
+    color: var(--gray-600);
+  }
+
+  .chicago-table tr:nth-child(even) td { background: var(--green-50); }
+  .chicago-table tr:last-child td { border-bottom: none; }
+
+  .score-eagle { color: #c0392b; font-weight: 700; }
+  .score-birdie { color: #e67e22; font-weight: 700; }
+  .score-par { color: var(--green-600); font-weight: 700; }
+
+  .highlight-box {
+    background: linear-gradient(135deg, var(--sand) 0%, var(--cream) 100%);
+    border: 1px solid var(--gold);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-top: 16px;
+    font-size: 14px;
+    color: var(--gray-600);
+    line-height: 1.7;
+  }
+
+  .highlight-box strong { color: var(--dark); }
+
+  .example-box {
+    background: var(--gray-100);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--gray-800);
+    font-family: 'DM Mono', monospace;
+    line-height: 1.7;
+  }
+
+  .example-box .ex-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--gray-400);
+    margin-bottom: 6px;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+  }
+
+  .tag-team { background: var(--green-100); color: var(--green-700); }
+  .tag-individual { background: #e3f2fd; color: #1565c0; }
+  .tag-matchplay { background: #fce4ec; color: #c62828; }
+  .tag-net { background: var(--sand); color: var(--gold-dark); }
+
+  /* === HANDICAP EXPLAINER === */
+  .handicap-section {
+    margin-top: 60px;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 16px;
+    padding: 32px;
+  }
+
+  .handicap-section h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--dark);
+  }
+
+  .handicap-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 20px;
+  }
+
+  .hc-box {
+    background: var(--green-50);
+    border: 1px solid var(--green-200);
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .hc-box h5 {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--green-700);
+    margin-bottom: 8px;
+  }
+
+  .hc-box p {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--gray-600);
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 768px) {
+    .rules-grid { grid-template-columns: 1fr; }
+    .handicap-grid { grid-template-columns: 1fr; }
+    .format-header { flex-direction: column; }
+    .format-day-num { min-width: unset; flex-direction: row; gap: 12px; padding: 14px 20px; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="site-nav">
+  <a href="index.html" class="nav-brand">BuschLight Cup</a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Schedule</span>
+    </a>
+    <a href="instructions.html" class="nav-link active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <span>Rules</span>
+    </a>
+    <a href="scoring.html" class="nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>Live Scores</span>
+    </a>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-label">2026 Santee Golf Trip</div>
+    <h1 class="page-title">Game <em>Rules</em></h1>
+    <div class="page-subtitle">Complete Format Guide &bull; All 7 Days</div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- GENERAL COMPETITION RULES -->
+  <div class="section-header">
+    <div class="section-label">Every Day</div>
+    <h2 class="section-title">General Competition Rules</h2>
+  </div>
+
+  <div class="rules-grid">
+    <div class="rule-card">
+      <h4>Daily Skin Game</h4>
+      <p>Skins are paid every day Sunday through Friday alongside the main game format. A skin is won outright on a hole — ties carry over.</p>
+      <ul>
+        <li>Hole Low Net score</li>
+        <li>All natural Birdies, Eagles, Double Eagles</li>
+        <li>Natural Aces (hole-in-one)</li>
+        <li>Closest to the Pin on all Par 3s</li>
+      </ul>
+    </div>
+
+    <div class="rule-card">
+      <h4>Aces &amp; Double Eagles</h4>
+      <p>Natural Double Eagles and natural Aces are automatic jackpots — they take <strong>all</strong> of the skin money for that entire day. All other skins for the round are void.</p>
+    </div>
+
+    <div class="rule-card gold-border full-width">
+      <h4>&#9733; BuschLight Cup — Season Points</h4>
+      <p style="margin-bottom:12px">Points accumulate across all 7 days. Final standings determine the Cup winner. <strong>Prizes paid out at end of 18-hole play on Friday:</strong> 1st = $20 &bull; 2nd = $12 &bull; 3rd = $8</p>
+      <table class="points-table">
+        <thead>
+          <tr>
+            <th>Event Type</th>
+            <th>Points Available</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>4-Man Team Match — each 9 holes</td>
+            <td><span class="pts-badge">100 pts</span></td>
+            <td>Ties split evenly</td>
+          </tr>
+          <tr>
+            <td>4-Man Team Match — 18-hole total</td>
+            <td><span class="pts-badge">100 pts</span></td>
+            <td>Ties split evenly</td>
+          </tr>
+          <tr>
+            <td>2-Man Team Match — each 9 holes</td>
+            <td><span class="pts-badge">100 pts</span></td>
+            <td>Ties split evenly</td>
+          </tr>
+          <tr>
+            <td>2-Man Team Match — 18-hole total</td>
+            <td><span class="pts-badge">100 pts</span></td>
+            <td>Ties split evenly</td>
+          </tr>
+          <tr>
+            <td>Individual Chicago — front 9</td>
+            <td><span class="pts-badge">100 pts</span></td>
+            <td>Ties split evenly</td>
+          </tr>
+          <tr>
+            <td>Individual Chicago — back 9</td>
+            <td><span class="pts-badge">100 pts</span></td>
+            <td>Ties split evenly</td>
+          </tr>
+          <tr>
+            <td>Individual Chicago — 18-hole total</td>
+            <td><span class="pts-badge">100 pts</span></td>
+            <td>Ties split evenly</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DAY-BY-DAY FORMATS -->
+  <div class="section-header">
+    <div class="section-label">Day-by-Day</div>
+    <h2 class="section-title">Format Breakdown</h2>
+  </div>
+
+  <div class="day-formats">
+
+    <!-- SUNDAY: 123 Ball -->
+    <div class="format-card">
+      <div class="format-header">
+        <div class="format-day-num"><span class="num">01</span><span class="lbl">Day</span></div>
+        <div class="format-header-info">
+          <div class="format-day-name">Sunday</div>
+          <div class="format-name">123 Ball</div>
+          <div class="format-course">Lake Marion &bull; 8:36 AM</div>
+        </div>
+      </div>
+      <div class="format-body">
+        <span class="tag tag-team">Team Format</span>
+        <span class="tag tag-net">Net Scores</span>
+
+        <p>Two 4-man teams compete head-to-head. On every hole, the number of scores that count rotates in a 1-2-3 pattern. Three separate competitions run simultaneously: front 9, back 9, and 18-hole total.</p>
+
+        <div class="how-it-works">
+          <h5>How It Works — The Rotation</h5>
+          <p style="font-size:13px;margin-bottom:10px;color:var(--gray-600)">The number of scores counted per team follows the hole number. The pattern repeats every 3 holes:</p>
+          <table class="chicago-table">
+            <thead><tr><th>Holes</th><th>Scores Counted</th><th>Hole Examples</th></tr></thead>
+            <tbody>
+              <tr><td><strong>1</strong> Best Net</td><td>Only the single lowest net score on your team counts</td><td>1, 4, 7, 10, 13, 16</td></tr>
+              <tr><td><strong>2</strong> Best Nets</td><td>The two lowest net scores are added together</td><td>2, 5, 8, 11, 14, 17</td></tr>
+              <tr><td><strong>3</strong> Best Nets</td><td>The three lowest net scores are added together</td><td>3, 6, 9, 12, 15, 18</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="example-box">
+          <div class="ex-label">Example — Hole 3 (count 3 best nets, par 4)</div>
+          Player A: gross 5, handicap strokes on this hole = 1 → net 4<br>
+          Player B: gross 4, no strokes → net 4<br>
+          Player C: gross 6, 1 stroke → net 5<br>
+          Player D: gross 7, 2 strokes → net 5<br>
+          <strong>Team score = 4 + 4 + 5 = 13</strong>
+        </div>
+
+        <div class="highlight-box">
+          <strong>Payout:</strong> $16 to the winning team of each 9 holes + $16 for the 18-hole total. $32 in skins. Total purse: <strong>$80</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- MONDAY: 2 Man 1 Best Ball -->
+    <div class="format-card">
+      <div class="format-header">
+        <div class="format-day-num"><span class="num">02</span><span class="lbl">Day</span></div>
+        <div class="format-header-info">
+          <div class="format-day-name">Monday</div>
+          <div class="format-name">2 Man 1 Best Ball</div>
+          <div class="format-course">Santee Cooper &bull; 8:36 AM</div>
+        </div>
+      </div>
+      <div class="format-body">
+        <span class="tag tag-team">Team Format</span>
+        <span class="tag tag-net">Net Scores</span>
+
+        <p>Everyone is split into two-man teams. On every hole, only the <strong>lowest net score</strong> between the two partners counts. Two groups of two teams play against each other, with front 9, back 9, and 18-hole competitions.</p>
+
+        <div class="how-it-works">
+          <h5>How It Works</h5>
+          <ol class="step-list">
+            <li>Both partners play their own ball for the entire round.</li>
+            <li>After each hole, each partner calculates their net score (gross minus any handicap strokes received on that hole).</li>
+            <li>The lower of the two net scores is the team's score for that hole.</li>
+            <li>Team totals are compared at the end of each 9 and the full 18.</li>
+          </ol>
+        </div>
+
+        <div class="example-box">
+          <div class="ex-label">Example — Hole 7 (par 4)</div>
+          Player A (10 hcp): gross 5, 0 strokes this hole → net 5<br>
+          Player B (18 hcp): gross 6, 1 stroke this hole → net 5<br>
+          <strong>Team score = 5</strong> (tied — either counts)
+        </div>
+
+        <div class="highlight-box">
+          <strong>Groups:</strong> Group 1 plays Group 1's teams against each other. Group 2 plays Group 2's teams. Each group has independent 9-hole and 18-hole matches.<br><br>
+          <strong>Payout:</strong> $16 to winning team per 9 + $16 for 18 total per group. $32 in skins. Total purse: <strong>$80</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- TUESDAY: 4 Man Team Chicago -->
+    <div class="format-card">
+      <div class="format-header">
+        <div class="format-day-num"><span class="num">03</span><span class="lbl">Day</span></div>
+        <div class="format-header-info">
+          <div class="format-day-name">Tuesday</div>
+          <div class="format-name">4 Man Team Chicago</div>
+          <div class="format-course">Wyboo &bull; 9:00 AM</div>
+        </div>
+      </div>
+      <div class="format-body">
+        <span class="tag tag-team">Team Format</span>
+
+        <p>A team-based version of the Chicago scoring game. Each player earns points on every hole based on their score relative to par. The team's combined point total is compared against a combined quota.</p>
+
+        <div class="how-it-works">
+          <h5>Chicago Points Per Hole (Gross Score)</h5>
+          <table class="chicago-table">
+            <thead><tr><th>Score</th><th>Points</th></tr></thead>
+            <tbody>
+              <tr><td>Double Eagle (−3)</td><td><strong>5 pts</strong></td></tr>
+              <tr><td>Eagle (−2)</td><td><strong>4 pts</strong></td></tr>
+              <tr><td>Birdie (−1)</td><td><strong>3 pts</strong></td></tr>
+              <tr><td>Par (E)</td><td><strong>2 pts</strong></td></tr>
+              <tr><td>Bogey (+1)</td><td><strong>1 pt</strong></td></tr>
+              <tr><td>Double bogey or worse (+2 or more)</td><td><strong>0 pts</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="how-it-works" style="margin-top:12px">
+          <h5>Individual Quota</h5>
+          <p style="font-size:14px;color:var(--gray-600)">Each player's quota = <strong>36 minus their handicap index</strong> (rounded). This is the number of points you're expected to earn across 18 holes. A net positive over quota is a good round.</p>
+          <div class="example-box" style="margin-top:8px">
+            <div class="ex-label">Example</div>
+            Player with 12 handicap → Quota = 36 − 12 = <strong>24 points</strong><br>
+            If they earn 27 points total → Score = 27 − 24 = <strong>+3</strong>
+          </div>
+        </div>
+
+        <div class="highlight-box">
+          <strong>Team score</strong> = sum of all 4 players' scores vs. sum of all 4 quotas.<br>
+          Front 9, back 9, and 18-hole totals all count separately.<br><br>
+          <strong>Payout:</strong> $16 per 9-hole win + $16 for 18-hole total. $32 in skins. Total purse: <strong>$80</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEDNESDAY: 4 Man 2 Best Balls -->
+    <div class="format-card">
+      <div class="format-header">
+        <div class="format-day-num"><span class="num">04</span><span class="lbl">Day</span></div>
+        <div class="format-header-info">
+          <div class="format-day-name">Wednesday</div>
+          <div class="format-name">4 Man Team — 2 Best Balls</div>
+          <div class="format-course">Santee National &bull; 8:30 AM</div>
+        </div>
+      </div>
+      <div class="format-body">
+        <span class="tag tag-team">Team Format</span>
+        <span class="tag tag-net">Net Scores</span>
+
+        <p>Two 4-man teams compete. On every hole, the <strong>two lowest net scores</strong> from your 4 teammates are added together to form the team's hole score.</p>
+
+        <div class="how-it-works">
+          <h5>How It Works</h5>
+          <ol class="step-list">
+            <li>All 4 players play their own ball and calculate net score per hole.</li>
+            <li>Rank the 4 net scores from lowest to highest.</li>
+            <li>Add only the two lowest together — that's the team score for the hole.</li>
+            <li>Compare team totals for front 9, back 9, and 18 holes.</li>
+          </ol>
+        </div>
+
+        <div class="example-box">
+          <div class="ex-label">Example — Hole 11 (par 5)</div>
+          Player A: net 4 &nbsp;|&nbsp; Player B: net 5 &nbsp;|&nbsp; Player C: net 6 &nbsp;|&nbsp; Player D: net 5<br>
+          Sorted: 4, 5, 5, 6 → Take 2 lowest: 4 + 5 = <strong>9</strong>
+        </div>
+
+        <div class="highlight-box">
+          <strong>Payout:</strong> $16 to winning team per 9 + $16 for 18-hole total. $32 in skins. Total purse: <strong>$80</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- THURSDAY: 4 Man Designated Hole + 1 -->
+    <div class="format-card">
+      <div class="format-header">
+        <div class="format-day-num"><span class="num">05</span><span class="lbl">Day</span></div>
+        <div class="format-header-info">
+          <div class="format-day-name">Thursday</div>
+          <div class="format-name">4 Man Designated Hole + 1 Best Score</div>
+          <div class="format-course">Players Course &bull; 9:00 AM</div>
+        </div>
+      </div>
+      <div class="format-body">
+        <span class="tag tag-team">Team Format</span>
+        <span class="tag tag-net">Net Scores</span>
+
+        <p>A twist on best-ball formats. On most holes, only the single best net score from the team counts. However, on <strong>designated holes</strong> (determined before the round), all 4 players' net scores count.</p>
+
+        <div class="how-it-works">
+          <h5>How It Works</h5>
+          <ol class="step-list">
+            <li>Before teeing off, agree on which holes are the "designated holes" (typically 2–4 holes per 9).</li>
+            <li>On regular holes: only the single lowest net score counts for the team.</li>
+            <li>On designated holes: all 4 net scores are added together.</li>
+            <li>Front 9, back 9, and 18-hole totals are all separate competitions.</li>
+          </ol>
+        </div>
+
+        <div class="highlight-box" style="margin-top:0">
+          <strong>Strategy note:</strong> Designated holes dramatically increase the weight of those holes. Everyone must play well on them — there's no hiding behind a better partner's score.<br><br>
+          <strong>Payout:</strong> $16 per 9-hole win + $16 for 18-hole total. $32 in skins. Total purse: <strong>$80</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- FRIDAY: Individual Chicago -->
+    <div class="format-card">
+      <div class="format-header">
+        <div class="format-day-num"><span class="num">06</span><span class="lbl">Day</span></div>
+        <div class="format-header-info">
+          <div class="format-day-name">Friday</div>
+          <div class="format-name">Individual Chicago</div>
+          <div class="format-course">Lake Marion &bull; 9:16 AM</div>
+        </div>
+      </div>
+      <div class="format-body">
+        <span class="tag tag-individual">Individual Format</span>
+
+        <p>The final full-round game — every man for himself. Players are split into two groups based on BuschLight Cup standings heading into Friday (1st–4th vs. 5th–8th). Chicago scoring determines the winner within each group.</p>
+
+        <div class="how-it-works">
+          <h5>Chicago Scoring</h5>
+          <table class="chicago-table">
+            <thead><tr><th>Score on Hole</th><th>Points Earned</th></tr></thead>
+            <tbody>
+              <tr><td>Double Eagle</td><td><strong>5 pts</strong></td></tr>
+              <tr><td>Eagle</td><td><strong>4 pts</strong></td></tr>
+              <tr><td>Birdie</td><td><strong>3 pts</strong></td></tr>
+              <tr><td>Par</td><td><strong>2 pts</strong></td></tr>
+              <tr><td>Bogey</td><td><strong>1 pt</strong></td></tr>
+              <tr><td>Double Bogey or worse</td><td><strong>0 pts</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="how-it-works" style="margin-top:12px">
+          <h5>Quota &amp; Final Score</h5>
+          <p style="font-size:14px;color:var(--gray-600)">Your quota = <strong>36 minus your handicap</strong>. Your final Chicago score is total points earned minus your quota. The highest score wins.</p>
+          <div class="example-box" style="margin-top:8px">
+            <div class="ex-label">Example — 15 handicap player</div>
+            Quota = 36 − 15 = 21 points expected<br>
+            Earns 8 birdies (24 pts) + 10 pars (20 pts) = 44 pts total<br>
+            Final score = 44 − 21 = <strong>+23</strong>
+          </div>
+        </div>
+
+        <div class="highlight-box">
+          <strong>Groupings:</strong> Group 1 = BuschLight Cup positions 1–4. Group 2 = positions 5–8.<br>
+          Front 9 winner, Back 9 winner, and Overall winner are determined within each group.<br><br>
+          <strong>Payout:</strong> $10 to 9-hole group winners. Overall prizes: 1st $10 &bull; 2nd $7 &bull; 3rd $5 &bull; 4th $3 per group. $35 in skins. Total purse: <strong>$80</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- SATURDAY: Match Play -->
+    <div class="format-card">
+      <div class="format-header">
+        <div class="format-day-num"><span class="num">07</span><span class="lbl">Day</span></div>
+        <div class="format-header-info">
+          <div class="format-day-name">Saturday</div>
+          <div class="format-name">Match Play</div>
+          <div class="format-course">TBD &bull; TBD</div>
+        </div>
+      </div>
+      <div class="format-body">
+        <span class="tag tag-matchplay">Match Play</span>
+
+        <p>The grand finale. One-on-one match play, scored like the Ryder Cup. Pairings are determined by final handicap standings — lowest 2 play against highest 2. Stakes are negotiated between matched players.</p>
+
+        <div class="how-it-works">
+          <h5>Match Play Rules</h5>
+          <ol class="step-list">
+            <li>Each hole is a win (1 up), loss, or halve — total strokes don't matter.</li>
+            <li>The player/team ahead in holes won is "X up." The match ends early if the lead becomes mathematically insurmountable (e.g., 3&amp;2 = 3 up with 2 holes left).</li>
+            <li>Handicap strokes are applied based on the difference between players' handicaps. The lower handicapper gives strokes on the hardest holes.</li>
+            <li>What you're playing for ($$$) is agreed upon before the match.</li>
+          </ol>
+        </div>
+
+        <div class="highlight-box">
+          <strong>Pairings:</strong> Final handicaps after Friday's round determine matchups. Lowest vs. Highest. The 2nd lowest vs. the 2nd highest, etc.<br><br>
+          <strong>Payout:</strong> Determined by the players themselves before teeing off.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end day-formats -->
+
+  <!-- HANDICAP EXPLAINER -->
+  <div class="handicap-section">
+    <div class="section-label" style="margin-bottom:6px">Reference</div>
+    <h3>How Handicap Strokes Work</h3>
+    <p style="font-size:14px;line-height:1.7;color:var(--gray-600);margin-top:8px">Net scoring is used in most formats. Your handicap determines how many strokes you receive — and on which holes — to level the playing field.</p>
+
+    <div class="handicap-grid">
+      <div class="hc-box">
+        <h5>Course Handicap</h5>
+        <p>Your course handicap may differ from your handicap index. It's typically: <strong>Index × (Slope ÷ 113)</strong>, rounded to the nearest whole number. This is the number of strokes you receive for 18 holes.</p>
+      </div>
+      <div class="hc-box">
+        <h5>Stroke Allocation</h5>
+        <p>Each hole has a difficulty ranking (1–18). If your course handicap is 10, you receive 1 extra stroke on the 10 hardest holes. If it's 20, you receive 2 strokes on the 2 hardest holes and 1 stroke on the other 16.</p>
+      </div>
+      <div class="hc-box">
+        <h5>Net Score</h5>
+        <p>On a hole where you receive a stroke: net score = gross score − 1. On a hole where you receive no strokes: net score = gross score. Your net total over 18 holes should approximate scratch (72 or course par).</p>
+      </div>
+      <div class="hc-box">
+        <h5>Example</h5>
+        <p>Player with 14 handicap on a par-4 hole ranked #3 in difficulty. They receive 1 stroke (since 3 ≤ 14). They make gross 5 → net score = 5 − 1 = <strong>4 (par)</strong>.</p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end content -->
+
+<script>
+  // Smooth scroll to section if hash link used
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const el = document.querySelector(a.getAttribute('href'));
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+</script>
+</body>
+</html>

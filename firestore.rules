@@ -1,0 +1,56 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // players/{uid}
+    // Any signed-in user can read profiles (scoring app needs names + handicaps)
+    // Users can only write their own profile
+    match /players/{uid} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && request.auth.uid == uid;
+      allow delete: if false;
+    }
+
+    // pending_players/{email}
+    // Pre-registered players added by admin before they sign in
+    match /pending_players/{email} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+
+    // scores/{scoreId}
+    // Anyone can read scores (public live leaderboard)
+    // Only authenticated users can write their own score
+    match /scores/{scoreId} {
+      allow read: if true;
+
+      allow create, update: if isSignedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.year is int
+        && request.resource.data.dayNumber is int
+        && request.resource.data.dayNumber >= 1
+        && request.resource.data.dayNumber <= 7
+        && request.resource.data.holes is list
+        && request.resource.data.holes.size() == 18;
+
+      allow delete: if false;
+    }
+
+    // courses/{courseId}
+    // Par and hole difficulty config per day - readable by all, writable by signed-in users
+    match /courses/{courseId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // Deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

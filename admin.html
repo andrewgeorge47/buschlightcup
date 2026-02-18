@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — BuschLight Cup 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<style>
+:root {
+  --green-900: #1a3a1a;
+  --green-800: #234d23;
+  --green-700: #2d6a2d;
+  --green-600: #3d8b3d;
+  --green-500: #4caf50;
+  --green-400: #66bb6a;
+  --green-300: #a5d6a7;
+  --green-200: #c8e6c9;
+  --green-100: #e8f5e9;
+  --green-50: #f1f8f1;
+  --gold: #c9a84c;
+  --gold-dark: #a08030;
+  --cream: #faf8f2;
+  --sand: #f0ead6;
+  --dark: #1a1a18;
+  --gray-800: #2d2d2a;
+  --gray-600: #5a5a55;
+  --gray-400: #8a8a85;
+  --gray-200: #d4d4cf;
+  --gray-100: #eaeae5;
+  --white: #ffffff;
+  --red-accent: #c0392b;
+  --red-light: #fce4ec;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--gray-100);
+  color: var(--dark);
+  min-height: 100vh;
+}
+
+/* === NAV === */
+.site-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 56px;
+  background: rgba(26,58,26,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.nav-brand {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-decoration: none;
+}
+
+.nav-links { display: flex; align-items: center; gap: 4px; }
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.nav-link:hover { background: rgba(255,255,255,0.1); color: var(--white); }
+.nav-link svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+@media (max-width: 480px) {
+  .nav-link span { display: none; }
+  .nav-link { padding: 8px 10px; }
+  .nav-brand { font-size: 10px; letter-spacing: 2px; }
+}
+
+/* === SCREENS === */
+.screen { display: none; min-height: 100vh; padding-top: 56px; }
+.screen.active { display: block; }
+
+/* === AUTH GATE === */
+.auth-gate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 56px);
+  background: linear-gradient(165deg, var(--green-900), var(--green-700));
+  padding: 40px 20px;
+}
+
+.auth-card {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 40px 36px;
+  max-width: 360px;
+  width: 100%;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.25);
+}
+
+.auth-card h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  margin-bottom: 6px;
+  color: var(--dark);
+}
+
+.auth-card p { font-size: 13px; color: var(--gray-400); margin-bottom: 24px; }
+
+.form-group { margin-bottom: 18px; }
+
+.form-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--gray-600);
+  margin-bottom: 6px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 2px solid var(--gray-200);
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--dark);
+  background: var(--white);
+  outline: none;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+}
+
+.form-input:focus { border-color: var(--green-500); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+  outline: none;
+}
+
+.btn-block { width: 100%; }
+.btn-primary { background: var(--green-700); color: var(--white); }
+.btn-primary:hover { background: var(--green-800); }
+.btn-secondary { background: var(--gray-100); color: var(--dark); }
+.btn-secondary:hover { background: var(--gray-200); }
+.btn-danger { background: var(--red-light); color: var(--red-accent); }
+.btn-danger:hover { background: #f8bbd0; }
+.btn-sm { padding: 7px 14px; font-size: 12px; border-radius: 8px; }
+
+.alert {
+  padding: 11px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.alert-error { background: var(--red-light); color: var(--red-accent); border: 1px solid #f8bbd0; }
+.alert-success { background: var(--green-100); color: var(--green-800); border: 1px solid var(--green-300); }
+
+/* === ADMIN LAYOUT === */
+.admin-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: calc(100vh - 56px);
+}
+
+.sidebar {
+  background: var(--green-900);
+  padding: 24px 0;
+  position: sticky;
+  top: 56px;
+  height: calc(100vh - 56px);
+  overflow-y: auto;
+}
+
+.sidebar-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--green-400);
+  padding: 0 20px;
+  margin-bottom: 8px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.65);
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+}
+
+.sidebar-link:hover { background: rgba(255,255,255,0.05); color: var(--white); }
+.sidebar-link.active { background: rgba(255,255,255,0.08); color: var(--white); border-left-color: var(--gold); }
+.sidebar-link svg { width: 16px; height: 16px; opacity: 0.7; }
+.sidebar-link.active svg { opacity: 1; }
+
+.sidebar-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 12px 0; }
+
+.main-content { padding: 32px; overflow-y: auto; }
+
+/* Panel system */
+.panel { display: none; }
+.panel.active { display: block; }
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.panel-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--dark);
+}
+
+.panel-subtitle {
+  font-size: 14px;
+  color: var(--gray-400);
+  margin-top: 2px;
+}
+
+/* Cards */
+.card {
+  background: var(--white);
+  border-radius: 12px;
+  border: 1px solid var(--gray-200);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--green-700);
+  margin-bottom: 16px;
+}
+
+/* Player Table */
+.player-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.player-table th {
+  background: var(--green-800);
+  color: var(--white);
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+.player-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--gray-100);
+  color: var(--gray-600);
+  vertical-align: middle;
+}
+
+.player-table tr:last-child td { border-bottom: none; }
+.player-table tr:hover td { background: var(--green-50); }
+
+.player-table td:first-child { font-weight: 600; color: var(--dark); }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.badge-active { background: var(--green-100); color: var(--green-700); }
+.badge-inactive { background: var(--gray-100); color: var(--gray-400); }
+
+/* Inline edit */
+.inline-edit { display: flex; align-items: center; gap: 8px; }
+
+.inline-input {
+  padding: 5px 10px;
+  border: 1px solid var(--gray-200);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--dark);
+  width: 80px;
+  outline: none;
+}
+
+.inline-input:focus { border-color: var(--green-500); }
+
+/* Add Player Form */
+.add-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr 120px auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.add-form-group { display: flex; flex-direction: column; gap: 4px; }
+.add-form-group label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--gray-400); }
+.add-form-group input {
+  padding: 9px 12px;
+  border: 2px solid var(--gray-200);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  color: var(--dark);
+}
+.add-form-group input:focus { border-color: var(--green-500); }
+
+/* Score Management */
+.score-filter-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.score-filter-bar select {
+  padding: 8px 12px;
+  border: 2px solid var(--gray-200);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--dark);
+  outline: none;
+  background: var(--white);
+  cursor: pointer;
+}
+
+.score-filter-bar select:focus { border-color: var(--green-500); }
+
+/* Course Settings */
+.course-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.hole-grid {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.hole-input-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.hole-input-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--gray-400);
+  font-family: 'DM Mono', monospace;
+}
+
+.hole-input {
+  width: 100%;
+  padding: 5px 0;
+  border: 1px solid var(--gray-200);
+  border-radius: 5px;
+  font-size: 13px;
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  color: var(--dark);
+  outline: none;
+}
+
+.hole-input:focus { border-color: var(--green-500); }
+
+/* Stats Overview */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 18px;
+  text-align: center;
+}
+
+.stat-card .stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--gray-400);
+  margin-bottom: 8px;
+}
+
+.stat-card .stat-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--green-700);
+}
+
+/* Spinner */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--gray-200);
+  border-top-color: var(--green-600);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Mobile */
+@media (max-width: 768px) {
+  .admin-layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; }
+  .add-form { grid-template-columns: 1fr 1fr; }
+  .course-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="site-nav">
+  <a href="index.html" class="nav-brand">BuschLight Cup</a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Schedule</span>
+    </a>
+    <a href="scoring.html" class="nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>Live Scores</span>
+    </a>
+  </div>
+</nav>
+
+<!-- SCREEN: Auth Gate -->
+<div id="screen-auth" class="screen active">
+  <div class="auth-gate">
+    <div class="auth-card">
+      <h2>Admin Panel</h2>
+      <p>Enter the admin passcode to access player management and settings.</p>
+      <div id="auth-alert"></div>
+      <div class="form-group">
+        <label class="form-label">Admin Passcode</label>
+        <input type="password" id="admin-passcode" class="form-input" placeholder="••••••"
+               onkeydown="if(event.key==='Enter') checkPasscode()">
+      </div>
+      <button class="btn btn-primary btn-block" onclick="checkPasscode()">Enter Admin</button>
+      <p style="margin-top:16px;font-size:12px;color:var(--gray-400);text-align:center">
+        Not an admin? <a href="index.html" style="color:var(--green-600)">Return to site</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: Admin App -->
+<div id="screen-admin" class="screen">
+  <div class="admin-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-label">Management</div>
+      <button class="sidebar-link active" onclick="showPanel('players')" id="sb-players">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Players</span>
+      </button>
+      <button class="sidebar-link" onclick="showPanel('scores')" id="sb-scores">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="3"/></svg>
+        <span>Scores</span>
+      </button>
+      <button class="sidebar-link" onclick="showPanel('courses')" id="sb-courses">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <span>Course Setup</span>
+      </button>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-label">Overview</div>
+      <button class="sidebar-link" onclick="showPanel('overview')" id="sb-overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span>Stats</span>
+      </button>
+      <div class="sidebar-divider"></div>
+      <button class="sidebar-link" onclick="adminSignOut()" style="color:rgba(255,255,255,0.4)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Sign Out</span>
+      </button>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+
+      <!-- PANEL: Players -->
+      <div id="panel-players" class="panel active">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Players</div>
+            <div class="panel-subtitle">Manage player profiles, handicaps, and registration</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="refreshPlayers()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+        </div>
+
+        <div id="players-alert"></div>
+
+        <!-- Add Player -->
+        <div class="card">
+          <div class="card-title">Add New Player</div>
+          <div class="add-form" id="add-player-form">
+            <div class="add-form-group">
+              <label>Display Name</label>
+              <input type="text" id="new-name" placeholder="e.g. John" maxlength="30">
+            </div>
+            <div class="add-form-group">
+              <label>Email Address</label>
+              <input type="email" id="new-email" placeholder="player@email.com">
+            </div>
+            <div class="add-form-group">
+              <label>Handicap Index</label>
+              <input type="number" id="new-handicap" placeholder="0.0" min="0" max="54" step="0.1" style="width:100%">
+            </div>
+            <div>
+              <button class="btn btn-primary" onclick="addPlayer()" style="height:42px">Add Player</button>
+            </div>
+          </div>
+          <p style="font-size:12px;color:var(--gray-400);margin-top:12px">
+            After adding a player, they can sign in with their email at <strong>scoring.html</strong> using the magic link. They'll appear in the system once they sign in for the first time.
+          </p>
+        </div>
+
+        <!-- Player List -->
+        <div class="card">
+          <div class="card-title">All Players</div>
+          <div id="players-loading" style="text-align:center;padding:24px;color:var(--gray-400)">
+            <span class="spinner"></span> Loading players...
+          </div>
+          <div id="players-table-wrap" style="display:none;overflow-x:auto">
+            <table class="player-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Handicap</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="players-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL: Scores -->
+      <div id="panel-scores" class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Score Management</div>
+            <div class="panel-subtitle">View and manage submitted scores</div>
+          </div>
+        </div>
+
+        <div class="score-filter-bar">
+          <select id="scores-day-filter" onchange="loadScoresPanel()">
+            <option value="">All Days</option>
+            <option value="1">Day 1 — Sunday</option>
+            <option value="2">Day 2 — Monday</option>
+            <option value="3">Day 3 — Tuesday</option>
+            <option value="4">Day 4 — Wednesday</option>
+            <option value="5">Day 5 — Thursday</option>
+            <option value="6">Day 6 — Friday</option>
+            <option value="7">Day 7 — Saturday</option>
+          </select>
+          <button class="btn btn-secondary btn-sm" onclick="loadScoresPanel()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+        </div>
+
+        <div id="scores-content">
+          <div style="text-align:center;padding:40px;color:var(--gray-400)">Select a filter above to view scores</div>
+        </div>
+      </div>
+
+      <!-- PANEL: Courses -->
+      <div id="panel-courses" class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Course Setup</div>
+            <div class="panel-subtitle">Configure par and hole difficulty per day</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Select Day to Configure</div>
+          <select id="course-day-select" class="form-input" style="max-width:360px;margin-bottom:20px" onchange="loadCourseSetup()">
+            <option value="">— Select a day —</option>
+            <option value="1">Day 1 — Sunday · Lake Marion</option>
+            <option value="2">Day 2 — Monday · Santee Cooper</option>
+            <option value="3">Day 3 — Tuesday · Wyboo</option>
+            <option value="4">Day 4 — Wednesday · Santee National</option>
+            <option value="5">Day 5 — Thursday · Players Course</option>
+            <option value="6">Day 6 — Friday · Lake Marion</option>
+            <option value="7">Day 7 — Saturday · TBD</option>
+          </select>
+
+          <div id="course-setup-form" style="display:none">
+            <div class="course-grid">
+              <div>
+                <div class="card-title">Par Per Hole</div>
+                <div class="hole-grid" id="par-inputs"></div>
+              </div>
+              <div>
+                <div class="card-title">Difficulty Ranking (1=Hardest)</div>
+                <div class="hole-grid" id="hcp-inputs"></div>
+              </div>
+            </div>
+
+            <div style="margin-top:20px;display:flex;gap:10px">
+              <button class="btn btn-primary" onclick="saveCourseSetup()">Save Course Settings</button>
+              <button class="btn btn-secondary" onclick="resetCourseDefaults()">Reset to Defaults</button>
+            </div>
+
+            <div id="course-save-alert" style="margin-top:12px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL: Overview -->
+      <div id="panel-overview" class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Trip Overview</div>
+            <div class="panel-subtitle">Summary stats for BuschLight Cup 2026</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="loadOverview()">Refresh</button>
+        </div>
+
+        <div id="overview-content">
+          <div style="text-align:center;padding:40px;color:var(--gray-400)">
+            <span class="spinner"></span> Loading...
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+// ──────────────────────────────────────────────
+// Firebase Init
+// ──────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyC1soSELTncOWIeGa_oMJoWqTU7yKS1RHA",
+  authDomain: "buschlightcup.firebaseapp.com",
+  projectId: "buschlightcup",
+  storageBucket: "buschlightcup.firebasestorage.app",
+  messagingSenderId: "944255498477",
+  appId: "1:944255498477:web:4ffea8e79b6ca1e00fb4e4"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const YEAR = 2026;
+
+// ══════════════════════════════════════════════
+// CHANGE THIS to your desired admin passcode
+// ══════════════════════════════════════════════
+const ADMIN_PASSCODE = 'busch2026';
+
+const DEFAULT_PARS     = [4,4,3,5,4,3,4,5,4, 4,3,5,4,4,3,5,4,4];
+const DEFAULT_HCP_ORDER = [1,5,9,13,3,15,7,11,17, 2,6,10,14,4,16,8,12,18];
+
+let adminAuthed = false;
+
+// ──────────────────────────────────────────────
+// Auth Gate
+// ──────────────────────────────────────────────
+function checkPasscode() {
+  const input = document.getElementById('admin-passcode').value;
+  if (input === ADMIN_PASSCODE) {
+    adminAuthed = true;
+    document.getElementById('screen-auth').classList.remove('active');
+    document.getElementById('screen-admin').classList.add('active');
+    refreshPlayers();
+    loadOverview();
+  } else {
+    document.getElementById('auth-alert').innerHTML =
+      '<div class="alert alert-error">Incorrect passcode.</div>';
+    document.getElementById('admin-passcode').value = '';
+  }
+}
+
+function adminSignOut() {
+  adminAuthed = false;
+  document.getElementById('screen-admin').classList.remove('active');
+  document.getElementById('screen-auth').classList.add('active');
+  document.getElementById('admin-passcode').value = '';
+}
+
+// ──────────────────────────────────────────────
+// Panel Navigation
+// ──────────────────────────────────────────────
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  document.getElementById(`panel-${name}`).classList.add('active');
+  document.getElementById(`sb-${name}`).classList.add('active');
+
+  if (name === 'players') refreshPlayers();
+  if (name === 'scores') loadScoresPanel();
+  if (name === 'overview') loadOverview();
+}
+
+// ──────────────────────────────────────────────
+// Players Panel
+// ──────────────────────────────────────────────
+async function refreshPlayers() {
+  document.getElementById('players-loading').style.display = 'block';
+  document.getElementById('players-table-wrap').style.display = 'none';
+
+  try {
+    const snap = await db.collection('players').get();
+    const players = [];
+    snap.forEach(doc => players.push({ id: doc.id, ...doc.data() }));
+    renderPlayersTable(players);
+  } catch (err) {
+    console.error(err);
+    document.getElementById('players-alert').innerHTML =
+      '<div class="alert alert-error">Error loading players. Check Firebase rules.</div>';
+    document.getElementById('players-loading').style.display = 'none';
+  }
+}
+
+function renderPlayersTable(players) {
+  const tbody = document.getElementById('players-tbody');
+  tbody.innerHTML = '';
+
+  if (!players.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--gray-400)">No players yet. Add the first player above.</td></tr>`;
+  } else {
+    players.forEach(p => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${escHtml(p.name || '—')}</td>
+        <td style="font-size:13px;color:var(--gray-400)">${escHtml(p.email || '—')}</td>
+        <td>
+          <div class="inline-edit">
+            <input type="number" class="inline-input" value="${p.handicap || 0}" min="0" max="54" step="0.1"
+              id="hcp-${p.id}" onblur="updateHandicap('${p.id}', '${escHtml(p.name || '')}')">
+          </div>
+        </td>
+        <td><span class="badge ${p.active !== false ? 'badge-active' : 'badge-inactive'}">${p.active !== false ? 'Active' : 'Inactive'}</span></td>
+        <td>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-secondary btn-sm" onclick="toggleActive('${p.id}', ${p.active !== false})">
+              ${p.active !== false ? 'Deactivate' : 'Activate'}
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="deletePlayer('${p.id}', '${escHtml(p.name || '')}')">Delete</button>
+          </div>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.getElementById('players-loading').style.display = 'none';
+  document.getElementById('players-table-wrap').style.display = 'block';
+}
+
+async function addPlayer() {
+  const name = document.getElementById('new-name').value.trim();
+  const email = document.getElementById('new-email').value.trim().toLowerCase();
+  const handicap = parseFloat(document.getElementById('new-handicap').value) || 0;
+  const alertEl = document.getElementById('players-alert');
+
+  if (!name) { alertEl.innerHTML = '<div class="alert alert-error">Name is required.</div>'; return; }
+  if (!email || !email.includes('@')) { alertEl.innerHTML = '<div class="alert alert-error">Valid email is required.</div>'; return; }
+
+  try {
+    // Store player profile keyed by email (UID unknown until they sign in)
+    // We use a separate "pending_players" collection for pre-registration
+    await db.collection('pending_players').doc(email).set({
+      name,
+      email,
+      handicap,
+      active: true,
+      addedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    alertEl.innerHTML = `<div class="alert alert-success">${name} added. They can now sign in at scoring.html using ${email}.</div>`;
+    document.getElementById('new-name').value = '';
+    document.getElementById('new-email').value = '';
+    document.getElementById('new-handicap').value = '';
+    refreshPlayers();
+  } catch (err) {
+    console.error(err);
+    alertEl.innerHTML = '<div class="alert alert-error">Error adding player. Try again.</div>';
+  }
+}
+
+async function updateHandicap(uid, name) {
+  const val = parseFloat(document.getElementById(`hcp-${uid}`).value) || 0;
+  try {
+    await db.collection('players').doc(uid).update({ handicap: val });
+    showAlert('players-alert', `${name}'s handicap updated to ${val}.`, 'success');
+  } catch (err) {
+    console.error(err);
+    showAlert('players-alert', 'Error updating handicap.', 'error');
+  }
+}
+
+async function toggleActive(uid, currentlyActive) {
+  try {
+    await db.collection('players').doc(uid).update({ active: !currentlyActive });
+    refreshPlayers();
+  } catch (err) {
+    showAlert('players-alert', 'Error updating player status.', 'error');
+  }
+}
+
+async function deletePlayer(uid, name) {
+  if (!confirm(`Delete ${name}? This cannot be undone and will not delete their scores.`)) return;
+  try {
+    await db.collection('players').doc(uid).delete();
+    showAlert('players-alert', `${name} removed.`, 'success');
+    refreshPlayers();
+  } catch (err) {
+    showAlert('players-alert', 'Error deleting player.', 'error');
+  }
+}
+
+// ──────────────────────────────────────────────
+// Scores Panel
+// ──────────────────────────────────────────────
+async function loadScoresPanel() {
+  const dayFilter = document.getElementById('scores-day-filter').value;
+  const container = document.getElementById('scores-content');
+  container.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400)"><span class="spinner"></span> Loading...</div>';
+
+  try {
+    let query = db.collection('scores').where('year', '==', YEAR);
+    if (dayFilter) query = query.where('dayNumber', '==', parseInt(dayFilter));
+
+    const snap = await query.get();
+    const allScores = [];
+    snap.forEach(doc => allScores.push({ id: doc.id, ...doc.data() }));
+
+    if (!allScores.length) {
+      container.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400)">No scores found for the selected filter.</div>';
+      return;
+    }
+
+    // Group by day
+    const byDay = {};
+    allScores.forEach(s => {
+      if (!byDay[s.dayNumber]) byDay[s.dayNumber] = [];
+      byDay[s.dayNumber].push(s);
+    });
+
+    let html = '';
+    Object.keys(byDay).sort().forEach(day => {
+      const dayScores = byDay[day];
+      html += `
+        <div class="card" style="margin-bottom:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div class="card-title">Day ${day} — ${dayScores[0]?.dayName || ''}</div>
+            <button class="btn btn-danger btn-sm" onclick="clearDayScores(${day})">Clear All Day ${day} Scores</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="player-table">
+              <thead>
+                <tr>
+                  <th>Player</th><th>Handicap</th><th>Holes</th>
+                  <th>Gross</th><th>Net</th><th>Chicago</th><th>Updated</th><th></th>
+                </tr>
+              </thead>
+              <tbody>`;
+
+      dayScores.forEach(s => {
+        const updated = s.lastUpdated?.toDate
+          ? new Date(s.lastUpdated.toDate()).toLocaleString()
+          : '—';
+        html += `
+          <tr>
+            <td>${escHtml(s.playerName || '—')}</td>
+            <td>${s.handicap ?? '—'}</td>
+            <td>${s.holesCompleted ?? 0} / 18</td>
+            <td>${s.grossTotal ?? '—'}</td>
+            <td>${s.netTotal ?? '—'}</td>
+            <td>${s.chicagoScore !== undefined ? (s.chicagoScore >= 0 ? '+' : '') + s.chicagoScore : '—'}</td>
+            <td style="font-size:12px;color:var(--gray-400)">${updated}</td>
+            <td>
+              <button class="btn btn-danger btn-sm" onclick="deleteScore('${s.id}', '${escHtml(s.playerName || '')}', ${day})">
+                Delete
+              </button>
+            </td>
+          </tr>`;
+      });
+
+      html += `</tbody></table></div></div>`;
+    });
+
+    container.innerHTML = html;
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = '<div class="alert alert-error">Error loading scores.</div>';
+  }
+}
+
+async function deleteScore(docId, playerName, day) {
+  if (!confirm(`Delete ${playerName}'s score for Day ${day}? This cannot be undone.`)) return;
+  try {
+    await db.collection('scores').doc(docId).delete();
+    loadScoresPanel();
+  } catch (err) {
+    alert('Error deleting score.');
+  }
+}
+
+async function clearDayScores(day) {
+  if (!confirm(`Clear ALL scores for Day ${day}? This cannot be undone.`)) return;
+  try {
+    const snap = await db.collection('scores')
+      .where('year', '==', YEAR)
+      .where('dayNumber', '==', parseInt(day))
+      .get();
+    const batch = db.batch();
+    snap.forEach(doc => batch.delete(doc.ref));
+    await batch.commit();
+    loadScoresPanel();
+  } catch (err) {
+    alert('Error clearing scores.');
+  }
+}
+
+// ──────────────────────────────────────────────
+// Course Setup Panel
+// ──────────────────────────────────────────────
+let courseEditData = { pars: [...DEFAULT_PARS], hcpOrder: [...DEFAULT_HCP_ORDER] };
+
+async function loadCourseSetup() {
+  const day = document.getElementById('course-day-select').value;
+  if (!day) { document.getElementById('course-setup-form').style.display = 'none'; return; }
+
+  document.getElementById('course-setup-form').style.display = 'block';
+
+  // Load existing data
+  try {
+    const doc = await db.collection('courses').doc(`${YEAR}_day${day}`).get();
+    if (doc.exists) {
+      const d = doc.data();
+      courseEditData.pars = d.pars || [...DEFAULT_PARS];
+      courseEditData.hcpOrder = d.hcpOrder || [...DEFAULT_HCP_ORDER];
+    } else {
+      courseEditData = { pars: [...DEFAULT_PARS], hcpOrder: [...DEFAULT_HCP_ORDER] };
+    }
+  } catch {
+    courseEditData = { pars: [...DEFAULT_PARS], hcpOrder: [...DEFAULT_HCP_ORDER] };
+  }
+
+  renderHoleInputs();
+}
+
+function renderHoleInputs() {
+  const parGrid = document.getElementById('par-inputs');
+  const hcpGrid = document.getElementById('hcp-inputs');
+  parGrid.innerHTML = '';
+  hcpGrid.innerHTML = '';
+
+  for (let i = 0; i < 18; i++) {
+    parGrid.innerHTML += `
+      <div class="hole-input-wrap">
+        <div class="hole-input-label">H${i + 1}</div>
+        <input type="number" class="hole-input" id="par-h${i}" value="${courseEditData.pars[i]}" min="3" max="6">
+      </div>`;
+
+    hcpGrid.innerHTML += `
+      <div class="hole-input-wrap">
+        <div class="hole-input-label">H${i + 1}</div>
+        <input type="number" class="hole-input" id="hcp-h${i}" value="${courseEditData.hcpOrder[i]}" min="1" max="18">
+      </div>`;
+  }
+}
+
+async function saveCourseSetup() {
+  const day = document.getElementById('course-day-select').value;
+  if (!day) return;
+
+  const pars = [];
+  const hcpOrder = [];
+  for (let i = 0; i < 18; i++) {
+    pars.push(parseInt(document.getElementById(`par-h${i}`).value) || 4);
+    hcpOrder.push(parseInt(document.getElementById(`hcp-h${i}`).value) || (i + 1));
+  }
+
+  try {
+    await db.collection('courses').doc(`${YEAR}_day${day}`).set({ pars, hcpOrder, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    showAlert('course-save-alert', 'Course settings saved successfully.', 'success');
+  } catch (err) {
+    showAlert('course-save-alert', 'Error saving. Check your connection.', 'error');
+  }
+}
+
+function resetCourseDefaults() {
+  courseEditData = { pars: [...DEFAULT_PARS], hcpOrder: [...DEFAULT_HCP_ORDER] };
+  renderHoleInputs();
+}
+
+// ──────────────────────────────────────────────
+// Overview Panel
+// ──────────────────────────────────────────────
+async function loadOverview() {
+  const container = document.getElementById('overview-content');
+  try {
+    const [playersSnap, scoresSnap] = await Promise.all([
+      db.collection('players').get(),
+      db.collection('scores').where('year', '==', YEAR).get()
+    ]);
+
+    const playerCount = playersSnap.size;
+    const scoreCount = scoresSnap.size;
+    let holesEntered = 0;
+    scoresSnap.forEach(doc => { holesEntered += doc.data().holesCompleted || 0; });
+
+    // Days with at least one score
+    const activeDays = new Set();
+    scoresSnap.forEach(doc => activeDays.add(doc.data().dayNumber));
+
+    container.innerHTML = `
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Players Registered</div><div class="stat-value">${playerCount}</div></div>
+        <div class="stat-card"><div class="stat-label">Score Cards</div><div class="stat-value">${scoreCount}</div></div>
+        <div class="stat-card"><div class="stat-label">Holes Entered</div><div class="stat-value">${holesEntered}</div></div>
+        <div class="stat-card"><div class="stat-label">Days Active</div><div class="stat-value">${activeDays.size} / 7</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Active Days</div>
+        <p style="font-size:14px;color:var(--gray-600)">${activeDays.size > 0
+          ? `Scores have been submitted for Day(s): ${[...activeDays].sort().join(', ')}`
+          : 'No scores submitted yet.'
+        }</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Quick Links</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <a href="scoring.html" class="btn btn-secondary btn-sm" target="_blank">Open Scoring App</a>
+          <a href="instructions.html" class="btn btn-secondary btn-sm" target="_blank">Open Rules Page</a>
+          <a href="index.html" class="btn btn-secondary btn-sm" target="_blank">Open Schedule</a>
+        </div>
+      </div>`;
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = '<div class="alert alert-error">Error loading overview. Check Firebase rules.</div>';
+  }
+}
+
+// ──────────────────────────────────────────────
+// Utilities
+// ──────────────────────────────────────────────
+function showAlert(containerId, msg, type) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+  setTimeout(() => { el.innerHTML = ''; }, 4000);
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// Enter key on passcode
+document.getElementById('admin-passcode').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkPasscode();
+});
+</script>
+</body>
+</html>
