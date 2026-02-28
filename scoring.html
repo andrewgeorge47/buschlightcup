@@ -8,7 +8,6 @@
 
 <!-- Firebase v9 compat (works without a build step) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <style>
@@ -897,6 +896,10 @@ body {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       <span>Live Scores</span>
     </a>
+    <a href="daily-leaderboard.html" class="nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span>Leaderboard</span>
+    </a>
   </div>
 </nav>
 
@@ -910,32 +913,25 @@ body {
     </div>
     <div id="login-alert"></div>
     <div class="form-group">
-      <label class="form-label" for="login-email">Your Email Address</label>
-      <input type="email" id="login-email" class="form-input" placeholder="you@example.com" autocomplete="email" inputmode="email">
+      <label class="form-label" for="player-select">Select Your Name</label>
+      <select id="player-select" class="form-input">
+        <option value="">— Choose player —</option>
+      </select>
     </div>
-    <button class="btn btn-primary" id="btn-send-link" onclick="sendLoginLink()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-      Send Sign-in Link
+    <div class="form-group">
+      <label class="form-label" for="player-pin">Enter Your PIN (4-6 digits)</label>
+      <input type="password" id="player-pin" class="form-input" placeholder="Enter PIN" maxlength="6" inputmode="numeric" pattern="[0-9]*" onkeypress="if(event.key==='Enter')loginWithPin()">
+      <p class="form-note">First time? Create a PIN to secure your scores. Your device will remember you.</p>
+    </div>
+    <button class="btn btn-primary" onclick="loginWithPin()" id="btn-login">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/></svg>
+      Sign In
     </button>
-    <p class="form-note">We'll email you a magic link. Click it on your phone to sign in — no password needed. Your device will remember you.</p>
     <div class="divider">or view without signing in</div>
     <button class="btn btn-secondary" onclick="viewLeaderboardOnly()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       View Live Scorecard
     </button>
-  </div>
-</div>
-
-<!-- SCREEN: Email Sent -->
-<div id="screen-email-sent" class="screen email-sent-screen">
-  <div class="email-sent-card">
-    <span class="email-icon">📧</span>
-    <h2>Check Your Email</h2>
-    <p>We sent a sign-in link to:</p>
-    <div class="email-highlight" id="sent-email-display">—</div>
-    <p>Open the link in this browser on your phone. It will sign you in automatically and save your device for future visits.</p>
-    <button class="btn btn-secondary" style="margin-top:8px" onclick="showScreen('screen-login')">Use a different email</button>
-    <p class="form-note" style="margin-top:16px">Didn't get it? Check your spam folder or try again.</p>
   </div>
 </div>
 
@@ -966,6 +962,16 @@ body {
       <option value="6">Day 6 — Friday · Lake Marion</option>
       <option value="7">Day 7 — Saturday · TBD</option>
     </select>
+  </div>
+
+  <!-- Round Selector (shown if second round exists) -->
+  <div class="day-selector-section" id="round-selector-section" style="display:none">
+    <label for="round-select">Select Round</label>
+    <select id="round-select" class="day-select" onchange="onRoundChange()">
+      <option value="1">Round 1 — Holes 1-18</option>
+      <option value="2">Round 2 — Holes 19-36</option>
+    </select>
+    <p style="font-size:12px;color:var(--gray-400);margin-top:8px" id="round-format-display"></p>
   </div>
 
   <!-- Tab Bar -->
@@ -1094,7 +1100,6 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
 const db = firebase.firestore();
 
 // ──────────────────────────────────────────────
@@ -1125,6 +1130,8 @@ const DEFAULT_HCP_ORDER = [1,5,9,13,3,15,7,11,17, 2,6,10,14,4,16,8,12,18];
 let currentUser = null;
 let currentPlayerData = null;
 let currentDay = null;
+let currentRound = 1; // 1 or 2
+let currentDayConfig = null; // Store full day configuration
 let scores = new Array(18).fill(0); // 0 = not entered
 let lbUnsubscribe = null;
 let lbOnlyUnsubscribe = null;
@@ -1139,96 +1146,182 @@ function showScreen(id) {
 }
 
 // ──────────────────────────────────────────────
-// Firebase Auth — Email Link
+// PIN-Based Authentication
 // ──────────────────────────────────────────────
-async function sendLoginLink() {
-  const email = document.getElementById('login-email').value.trim();
-  const alertEl = document.getElementById('login-alert');
-
-  if (!email || !email.includes('@')) {
-    alertEl.innerHTML = '<div class="alert alert-error">Please enter a valid email address.</div>';
-    return;
-  }
-
-  const btn = document.getElementById('btn-send-link');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px"></span> Sending...';
-  alertEl.innerHTML = '';
-
-  const actionCodeSettings = {
-    url: window.location.href, // redirect back to this page
-    handleCodeInApp: true
-  };
+async function loadPlayerList() {
+  const select = document.getElementById('player-select');
+  select.innerHTML = '<option value="">Loading players...</option>';
+  select.disabled = true;
 
   try {
-    await auth.sendSignInLinkToEmail(email, actionCodeSettings);
-    localStorage.setItem('emailForSignIn', email);
-    document.getElementById('sent-email-display').textContent = email;
-    showScreen('screen-email-sent');
+    const snap = await db.collection('players').where('active', '==', true).get();
+    select.innerHTML = '<option value="">— Choose player —</option>';
+
+    if (snap.empty) {
+      select.innerHTML = '<option value="">No players available</option>';
+      document.getElementById('login-alert').innerHTML =
+        '<div class="alert alert-error">No active players found. Contact your administrator.</div>';
+      return;
+    }
+
+    const players = [];
+    snap.forEach(doc => {
+      players.push({ id: doc.id, name: doc.data().name });
+    });
+
+    // Sort players alphabetically
+    players.sort((a, b) => a.name.localeCompare(b.name));
+
+    players.forEach(player => {
+      const option = document.createElement('option');
+      option.value = player.id;
+      option.textContent = player.name;
+      select.appendChild(option);
+    });
+
+    select.disabled = false;
   } catch (err) {
-    console.error(err);
-    let msg = 'Something went wrong. Please try again.';
-    if (err.code === 'auth/invalid-email') msg = 'That email address doesn\'t look right.';
-    if (err.code === 'auth/too-many-requests') msg = 'Too many attempts. Please wait a moment and try again.';
-    alertEl.innerHTML = `<div class="alert alert-error">${msg}</div>`;
-    btn.disabled = false;
-    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Sign-in Link';
+    console.error('Error loading players:', err);
+    select.innerHTML = '<option value="">Error loading players</option>';
+    document.getElementById('login-alert').innerHTML =
+      '<div class="alert alert-error">Error loading player list. Please refresh the page.</div>';
   }
 }
 
-async function handleEmailLinkSignIn() {
-  if (!auth.isSignInWithEmailLink(window.location.href)) return false;
+async function hashPin(pin) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(pin);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
-  let email = localStorage.getItem('emailForSignIn');
-  if (!email) {
-    email = window.prompt('Please enter the email you used to sign in:');
-    if (!email) return false;
+async function loginWithPin() {
+  const playerId = document.getElementById('player-select').value;
+  const pin = document.getElementById('player-pin').value.trim();
+  const alertEl = document.getElementById('login-alert');
+  const btnLogin = document.getElementById('btn-login');
+
+  if (!playerId) {
+    alertEl.innerHTML = '<div class="alert alert-error">Please select your name.</div>';
+    document.getElementById('player-select').focus();
+    return;
   }
+
+  if (!pin || pin.length < 4 || pin.length > 6 || !/^\d+$/.test(pin)) {
+    alertEl.innerHTML = '<div class="alert alert-error">Please enter a valid 4-6 digit PIN.</div>';
+    document.getElementById('player-pin').focus();
+    return;
+  }
+
+  // Show loading state
+  btnLogin.disabled = true;
+  btnLogin.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px"></span> Signing in...';
+  alertEl.innerHTML = '';
 
   try {
-    const result = await auth.signInWithEmailLink(email, window.location.href);
-    localStorage.removeItem('emailForSignIn');
-    // Clean URL
-    window.history.replaceState({}, document.title, window.location.pathname);
-    return true;
+    const playerDoc = await db.collection('players').doc(playerId).get();
+    if (!playerDoc.exists) {
+      alertEl.innerHTML = '<div class="alert alert-error">Player not found. Please contact your administrator.</div>';
+      btnLogin.disabled = false;
+      btnLogin.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/></svg> Sign In';
+      return;
+    }
+
+    const playerData = playerDoc.data();
+    const pinHash = await hashPin(pin);
+
+    // Check if PIN is already set
+    if (playerData.pinHash) {
+      // Verify PIN
+      if (playerData.pinHash !== pinHash) {
+        alertEl.innerHTML = '<div class="alert alert-error">Incorrect PIN. Please try again.</div>';
+        btnLogin.disabled = false;
+        btnLogin.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/></svg> Sign In';
+        document.getElementById('player-pin').value = '';
+        document.getElementById('player-pin').focus();
+        return;
+      }
+    } else {
+      // First time - create PIN
+      await db.collection('players').doc(playerId).update({
+        pinHash: pinHash,
+        pinCreatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      alertEl.innerHTML = '<div class="alert alert-success">PIN created successfully!</div>';
+    }
+
+    // Save credentials to localStorage
+    localStorage.setItem('golfPlayerId', playerId);
+    localStorage.setItem('golfPlayerPin', pinHash);
+
+    // Set current user
+    currentUser = { uid: playerId };
+    await loadPlayerData(currentUser);
+    showScreen('screen-app');
+    buildScorecardUI();
+    tryAutoSelectDay();
   } catch (err) {
-    console.error('Email link sign in error:', err);
-    document.getElementById('login-alert').innerHTML =
-      '<div class="alert alert-error">Sign-in link is invalid or expired. Please request a new one.</div>';
-    showScreen('screen-login');
-    return false;
+    console.error('Login error:', err);
+    alertEl.innerHTML = '<div class="alert alert-error">Login failed. Please check your connection and try again.</div>';
+    btnLogin.disabled = false;
+    btnLogin.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/></svg> Sign In';
   }
+}
+
+async function checkSavedLogin() {
+  const savedPlayerId = localStorage.getItem('golfPlayerId');
+  const savedPinHash = localStorage.getItem('golfPlayerPin');
+
+  if (savedPlayerId && savedPinHash) {
+    try {
+      const playerDoc = await db.collection('players').doc(savedPlayerId).get();
+      if (playerDoc.exists && playerDoc.data().pinHash === savedPinHash) {
+        currentUser = { uid: savedPlayerId };
+        await loadPlayerData(currentUser);
+        showScreen('screen-app');
+        buildScorecardUI();
+        tryAutoSelectDay();
+        return true;
+      }
+    } catch (err) {
+      console.error('Saved login check error:', err);
+    }
+  }
+
+  return false;
 }
 
 function viewLeaderboardOnly() {
   showScreen('screen-leaderboard-only');
 }
 
-async function signOut() {
+function signOut() {
   if (lbUnsubscribe) lbUnsubscribe();
-  await auth.signOut();
+  localStorage.removeItem('golfPlayerId');
+  localStorage.removeItem('golfPlayerPin');
+  currentUser = null;
+  currentPlayerData = null;
   showScreen('screen-login');
+  location.reload(); // Refresh to reset state
 }
 
 // ──────────────────────────────────────────────
-// Auth State Observer
+// Initialize
 // ──────────────────────────────────────────────
-auth.onAuthStateChanged(async (user) => {
-  if (user) {
-    currentUser = user;
-    await loadPlayerData(user);
-    showScreen('screen-app');
-    buildScorecardUI();
-    // Auto-select today's day if we can
-    tryAutoSelectDay();
-  } else {
-    // Check for email link in URL
-    const handled = await handleEmailLinkSignIn();
-    if (!handled) {
-      showScreen('screen-login');
-    }
+async function initApp() {
+  // Load player list for login dropdown
+  await loadPlayerList();
+
+  // Check if user is already logged in
+  const loggedIn = await checkSavedLogin();
+
+  if (!loggedIn) {
+    showScreen('screen-login');
   }
-});
+}
+
+// Start the app
+initApp();
 
 // ──────────────────────────────────────────────
 // Player Data
@@ -1238,22 +1331,20 @@ async function loadPlayerData(user) {
     const doc = await db.collection('players').doc(user.uid).get();
     if (doc.exists) {
       currentPlayerData = doc.data();
+      document.getElementById('user-display-name').textContent = currentPlayerData.name || 'Player';
+      document.getElementById('user-handicap-display').textContent =
+        `Handicap: ${currentPlayerData.handicap || 0}`;
     } else {
-      // First time — create player record from email
-      const name = user.displayName || user.email.split('@')[0];
-      currentPlayerData = { name, email: user.email, handicap: 0, active: true };
-      await db.collection('players').doc(user.uid).set({
-        ...currentPlayerData,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      // Player record should exist (created by admin), but handle edge case
+      console.error('Player record not found for uid:', user.uid);
+      currentPlayerData = { name: 'Unknown Player', handicap: 0 };
+      document.getElementById('user-display-name').textContent = 'Unknown Player';
+      document.getElementById('user-handicap-display').textContent = 'Handicap: 0';
     }
-    document.getElementById('user-display-name').textContent = currentPlayerData.name;
-    document.getElementById('user-handicap-display').textContent =
-      `Handicap: ${currentPlayerData.handicap || 0}`;
   } catch (err) {
     console.error('Error loading player data:', err);
-    currentPlayerData = { name: user.email, handicap: 0 };
-    document.getElementById('user-display-name').textContent = user.email;
+    currentPlayerData = { name: 'Error Loading', handicap: 0 };
+    document.getElementById('user-display-name').textContent = 'Error Loading Player';
     document.getElementById('user-handicap-display').textContent = 'Handicap: 0';
   }
 }
@@ -1291,6 +1382,7 @@ function switchTab(tab) {
   });
 
   if (tab === 'leaderboard' && currentDay) {
+    // Reload leaderboard with current round
     loadLeaderboard(currentDay, 'lb-content', currentUser ? currentUser.uid : null);
   }
 }
@@ -1298,20 +1390,75 @@ function switchTab(tab) {
 // ──────────────────────────────────────────────
 // Day Change
 // ──────────────────────────────────────────────
-function onDayChange() {
+async function onDayChange() {
   const val = document.getElementById('day-select').value;
   currentDay = val ? parseInt(val) : null;
+  currentRound = 1; // Reset to round 1
   scores = new Array(18).fill(0);
 
   if (currentDay) {
-    loadCourseData(currentDay).then(() => {
-      buildScorecardUI();
-      loadExistingScores();
-    });
+    // Load day configuration to check for second round
+    await loadDayConfiguration(currentDay);
+
+    await loadCourseData(currentDay);
+    buildScorecardUI();
+    loadExistingScores();
+
     if (document.getElementById('content-leaderboard').classList.contains('active')) {
       loadLeaderboard(currentDay, 'lb-content', currentUser ? currentUser.uid : null);
     }
   }
+}
+
+async function loadDayConfiguration(dayNum) {
+  try {
+    const doc = await db.collection('days').doc(`${YEAR}_day${dayNum}`).get();
+    if (doc.exists) {
+      currentDayConfig = doc.data();
+
+      // Show round selector if second round exists
+      const hasSecondRound = currentDayConfig.secondRoundFormat && currentDayConfig.secondRoundFormat !== '';
+      const roundSelector = document.getElementById('round-selector-section');
+
+      if (hasSecondRound) {
+        roundSelector.style.display = 'block';
+        document.getElementById('round-select').value = '1';
+
+        // Format name mapping
+        const formatNames = {
+          '345': '3-4-5 (Par Competition)',
+          'shamble': 'Shamble',
+          'alt-shot': '2-Person Alternate Shot',
+          'rolly-polly': 'Rolly Polly 3-Putt',
+          'hi-lo': 'Hi-Lo (High-Low)',
+          'wolf': 'Wolf',
+          'best-ball': 'Best Ball',
+          'custom': 'Custom Format'
+        };
+
+        const round2FormatName = formatNames[currentDayConfig.secondRoundFormat] || currentDayConfig.secondRoundFormat;
+        document.getElementById('round-format-display').textContent = `Round 2: ${round2FormatName}`;
+      } else {
+        roundSelector.style.display = 'none';
+      }
+    } else {
+      currentDayConfig = null;
+      document.getElementById('round-selector-section').style.display = 'none';
+    }
+  } catch (err) {
+    console.error('Error loading day configuration:', err);
+    currentDayConfig = null;
+    document.getElementById('round-selector-section').style.display = 'none';
+  }
+}
+
+function onRoundChange() {
+  const val = document.getElementById('round-select').value;
+  currentRound = val ? parseInt(val) : 1;
+  scores = new Array(18).fill(0);
+
+  buildScorecardUI();
+  loadExistingScores();
 }
 
 function onDayChangeLeaderboardOnly() {
@@ -1419,12 +1566,15 @@ function renderHoleRows(containerId, startIdx, endIdx) {
     const strokes = strokesOnHole(i, ch);
     const hcpRank = courseData.hcpOrder[i];
 
+    // Display hole number: Round 1 = holes 1-18, Round 2 = holes 19-36
+    const displayHoleNum = currentRound === 2 ? (i + 19) : (i + 1);
+
     const row = document.createElement('div');
     row.className = 'hole-row';
     row.dataset.hole = i;
 
     row.innerHTML = `
-      <div class="hole-num">${i + 1}</div>
+      <div class="hole-num">${displayHoleNum}</div>
       <div class="hole-par-info">
         <div class="hole-par">Par ${par}</div>
         <div class="hole-hcp">HCP ${hcpRank}${strokes > 0 ? ` <span class="hole-stroke-indicator">+${strokes} stroke${strokes>1?'s':''}</span>` : ''}</div>
@@ -1513,7 +1663,8 @@ function updateTotals() {
   setText('back-net', backHoles ? backNet : '—');
   setText('back-pts', backHoles ? backPts : '—');
 
-  setText('holes-progress', `${totalHoles} / 18 holes`);
+  const roundLabel = currentRound === 2 ? ' (Round 2 — Holes 19-36)' : '';
+  setText('holes-progress', `${totalHoles} / 18 holes${roundLabel}`);
   setText('submit-holes-done', totalHoles);
 
   document.getElementById('btn-save-score').disabled = totalHoles === 0;
@@ -1553,13 +1704,14 @@ async function saveScore(silent = false) {
     holesCompleted++;
   }
 
-  const docId = `${YEAR}_day${currentDay}_${currentUser.uid}`;
+  const docId = `${YEAR}_day${currentDay}_round${currentRound}_${currentUser.uid}`;
   const data = {
     uid: currentUser.uid,
     playerName: currentPlayerData.name,
     email: currentUser.email,
     year: YEAR,
     dayNumber: currentDay,
+    roundNumber: currentRound,
     dayName: DAYS[currentDay].name,
     holes: scores,
     handicap: ch,
@@ -1596,7 +1748,7 @@ function showSaveStatus() {
 // ──────────────────────────────────────────────
 async function loadExistingScores() {
   if (!currentUser || !currentDay) return;
-  const docId = `${YEAR}_day${currentDay}_${currentUser.uid}`;
+  const docId = `${YEAR}_day${currentDay}_round${currentRound}_${currentUser.uid}`;
   try {
     const doc = await db.collection('scores').doc(docId).get();
     if (doc.exists) {
@@ -1626,13 +1778,17 @@ function loadLeaderboard(dayNum, containerId, myUid) {
       Loading scores...
     </div>`;
 
+  // Filter by round number as well
+  const roundNum = containerId === 'lb-content' ? currentRound : 1;
+
   const unsub = db.collection('scores')
     .where('year', '==', YEAR)
     .where('dayNumber', '==', dayNum)
+    .where('roundNumber', '==', roundNum)
     .onSnapshot(snap => {
       const allScores = [];
       snap.forEach(doc => allScores.push(doc.data()));
-      renderLeaderboard(allScores, dayNum, container, myUid);
+      renderLeaderboard(allScores, dayNum, container, myUid, roundNum);
     }, err => {
       console.error('Leaderboard error:', err);
       container.innerHTML = '<div class="lb-empty">Error loading scores. Check connection.</div>';
@@ -1642,16 +1798,17 @@ function loadLeaderboard(dayNum, containerId, myUid) {
   else lbOnlyUnsubscribe = unsub;
 }
 
-function renderLeaderboard(allScores, dayNum, container, myUid) {
+function renderLeaderboard(allScores, dayNum, container, myUid, roundNum = 1) {
   const day = DAYS[dayNum];
+  const roundLabel = roundNum === 2 ? ' — Round 2' : '';
 
   if (!allScores.length) {
     container.innerHTML = `
       <div class="leaderboard-day-header">
-        <div><div class="lb-day-name">${day.name}</div><div class="lb-format">${day.format}</div></div>
+        <div><div class="lb-day-name">${day.name}${roundLabel}</div><div class="lb-format">${day.format}</div></div>
         <div class="live-badge"><div class="live-dot"></div> Live</div>
       </div>
-      <div class="lb-empty">No scores submitted yet for ${day.name}.<br>Be the first to enter your score!</div>`;
+      <div class="lb-empty">No scores submitted yet for ${day.name}${roundLabel}.<br>Be the first to enter your score!</div>`;
     return;
   }
 

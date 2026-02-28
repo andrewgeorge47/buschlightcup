@@ -3,34 +3,23 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
     // players/{uid}
-    // Any signed-in user can read profiles (scoring app needs names + handicaps)
-    // Users can only write their own profile
+    // Public read so admin panel and scoring app can see all players.
+    // Admin panel has full CRUD (client-side passcode gate).
+    // Players create their own PIN on first login.
     match /players/{uid} {
-      allow read: if isSignedIn();
-      allow create, update: if isSignedIn() && request.auth.uid == uid;
-      allow delete: if false;
-    }
-
-    // pending_players/{email}
-    // Pre-registered players added by admin before they sign in
-    match /pending_players/{email} {
-      allow read: if isSignedIn();
-      allow write: if isSignedIn();
+      allow read, write: if true;
     }
 
     // scores/{scoreId}
-    // Anyone can read scores (public live leaderboard)
-    // Only authenticated users can write their own score
+    // Public read for the live leaderboard.
+    // PIN-based auth - validation is done client-side.
+    // Admin panel can create/update/delete any score (client-side passcode gate).
     match /scores/{scoreId} {
       allow read: if true;
 
-      allow create, update: if isSignedIn()
-        && request.resource.data.uid == request.auth.uid
+      // Players can create/update their own scores (PIN validation is client-side)
+      allow create, update: if request.resource.data.uid is string
         && request.resource.data.year is int
         && request.resource.data.dayNumber is int
         && request.resource.data.dayNumber >= 1
@@ -38,14 +27,26 @@ service cloud.firestore {
         && request.resource.data.holes is list
         && request.resource.data.holes.size() == 18;
 
-      allow delete: if false;
+      // Admin panel can delete any score
+      allow delete: if true;
     }
 
     // courses/{courseId}
-    // Par and hole difficulty config per day - readable by all, writable by signed-in users
+    // Par and difficulty config set by admin panel.
     match /courses/{courseId} {
-      allow read: if true;
-      allow write: if isSignedIn();
+      allow read, write: if true;
+    }
+
+    // formats/{formatId}
+    // Game format definitions set by admin panel.
+    match /formats/{formatId} {
+      allow read, write: if true;
+    }
+
+    // days/{dayId}
+    // Daily configuration (course + format assignments) set by admin panel.
+    match /days/{dayId} {
+      allow read, write: if true;
     }
 
     // Deny everything else

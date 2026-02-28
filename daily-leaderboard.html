@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Leaderboard — BuschLight Cup 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600;700;900&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<!-- Firebase v9 compat -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<style>
+:root {
+  --green-900: #1a3a1a;
+  --green-800: #234d23;
+  --green-700: #2d6a2d;
+  --green-600: #3d8b3d;
+  --green-500: #4caf50;
+  --green-400: #66bb6a;
+  --green-300: #a5d6a7;
+  --green-200: #c8e6c9;
+  --green-100: #e8f5e9;
+  --gold: #c9a84c;
+  --gold-light: #e8d48b;
+  --cream: #faf8f2;
+  --dark: #1a1a18;
+  --gray-800: #2d2d2a;
+  --gray-600: #5a5a55;
+  --gray-400: #8a8a85;
+  --gray-200: #d4d4cf;
+  --white: #ffffff;
+  --red-accent: #c0392b;
+  --blue-accent: #2471a3;
+  --birdie-color: #e67e22;
+  --eagle-color: #c0392b;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--white);
+  color: var(--dark);
+  overflow-x: hidden;
+}
+
+/* === HEADER === */
+.titleist-header {
+  background: var(--dark);
+  color: var(--white);
+  padding: 12px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  border-bottom: 2px solid var(--gold);
+}
+
+.titleist-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--white);
+}
+
+.titleist-ball {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--dark);
+  font-family: 'DM Mono', monospace;
+}
+
+.titleist-tagline {
+  font-size: 13px;
+  color: var(--gray-400);
+  font-weight: 500;
+}
+
+/* === MAIN SCORECARD === */
+.scorecard-container {
+  max-width: 1800px;
+  margin: 0 auto;
+  padding: 20px 24px 40px;
+}
+
+.course-info-bar {
+  background: linear-gradient(135deg, var(--green-900), var(--green-800));
+  color: var(--white);
+  padding: 18px 28px;
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.course-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--gold);
+}
+
+.course-meta {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+
+.course-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.course-meta-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--green-300);
+  font-weight: 700;
+}
+
+.course-meta-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--green-300);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.live-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #4caf50;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.2); }
+}
+
+.round-toggle {
+  display: flex;
+  gap: 6px;
+  background: rgba(0,0,0,0.2);
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.round-toggle-btn {
+  padding: 8px 14px;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.1);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
+  line-height: 1.3;
+}
+
+.round-toggle-btn:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(201,168,76,0.3);
+}
+
+.round-toggle-btn.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--dark);
+  font-weight: 700;
+}
+
+/* === SCORECARD TABLE === */
+.scorecard-table-wrap {
+  border: 3px solid var(--gray-200);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  overflow: hidden;
+  background: var(--white);
+}
+
+.scorecard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.scorecard-table th {
+  background: var(--green-700);
+  color: var(--white);
+  padding: 10px 8px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-right: 1px solid var(--green-600);
+}
+
+.scorecard-table th:first-child {
+  text-align: left;
+  padding-left: 16px;
+  width: 140px;
+  position: sticky;
+  left: 0;
+  background: var(--green-700);
+  z-index: 2;
+}
+
+.scorecard-table .front-nine-header { background: var(--blue-accent); }
+.scorecard-table .back-nine-header { background: var(--red-accent); }
+.scorecard-table .totals-header { background: var(--gray-800); }
+
+.scorecard-table td {
+  padding: 10px 8px;
+  text-align: center;
+  border-right: 1px solid var(--gray-200);
+  border-bottom: 1px solid var(--gray-200);
+  font-family: 'DM Mono', monospace;
+  font-size: 15px;
+  font-weight: 600;
+  background: var(--white);
+}
+
+.scorecard-table td:first-child {
+  text-align: left;
+  padding-left: 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--dark);
+  position: sticky;
+  left: 0;
+  background: var(--white);
+  z-index: 1;
+  border-right: 2px solid var(--gray-400);
+}
+
+.scorecard-table tr.handicap-row td {
+  background: #fce4ec;
+  color: var(--red-accent);
+  font-weight: 900;
+  font-size: 11px;
+}
+
+.scorecard-table tr.par-row td {
+  background: var(--green-100);
+  color: var(--dark);
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.scorecard-table tr.team-divider td {
+  background: var(--gray-400);
+  padding: 4px;
+  border-bottom: 3px solid var(--gray-600);
+}
+
+.scorecard-table tr.player-row td {
+  background: var(--white);
+}
+
+.scorecard-table tr.player-row:nth-child(even) td {
+  background: var(--cream);
+}
+
+.scorecard-table .score-birdie {
+  background: var(--birdie-color) !important;
+  color: var(--white) !important;
+  font-weight: 900;
+  border-radius: 4px;
+}
+
+.scorecard-table .score-eagle {
+  background: var(--eagle-color) !important;
+  color: var(--white) !important;
+  font-weight: 900;
+  border-radius: 4px;
+}
+
+.scorecard-table .score-par {
+  color: var(--green-600);
+}
+
+.scorecard-table .score-bogey {
+  color: var(--blue-accent);
+}
+
+.scorecard-table .totals-cell {
+  background: var(--gray-800) !important;
+  color: var(--white) !important;
+  font-weight: 900;
+  font-size: 18px;
+}
+
+/* === TRACKING SECTIONS === */
+.tracking-sections {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+}
+
+.tracking-card {
+  background: var(--white);
+  border: 2px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.tracking-card-title {
+  font-size: 14px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--gray-200);
+}
+
+.tracking-card-title.green { color: var(--green-700); border-color: var(--green-300); }
+.tracking-card-title.blue { color: var(--blue-accent); border-color: #90caf9; }
+.tracking-card-title.red { color: var(--red-accent); border-color: #f8bbd0; }
+
+.tracking-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 15px;
+}
+
+.tracking-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--cream);
+}
+
+.tracking-row.winner {
+  background: var(--gold);
+  color: var(--dark);
+  font-weight: 900;
+}
+
+.tracking-row .label {
+  font-weight: 600;
+}
+
+.tracking-row .value {
+  font-family: 'DM Mono', monospace;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+/* === POINTS TABLE === */
+.points-section {
+  margin-top: 32px;
+  background: var(--white);
+  border: 3px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.points-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--gold);
+  margin-bottom: 20px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.points-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 2fr;
+  gap: 32px;
+}
+
+.points-column h3 {
+  font-size: 16px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--dark);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--gold);
+  text-align: center;
+}
+
+.points-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.points-table th {
+  background: var(--green-800);
+  color: var(--white);
+  padding: 8px 10px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.points-table th:first-child {
+  text-align: left;
+}
+
+.points-table td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid var(--gray-200);
+  font-family: 'DM Mono', monospace;
+  font-weight: 600;
+}
+
+.points-table td:first-child {
+  text-align: left;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  color: var(--dark);
+}
+
+.points-table tr:nth-child(even) td {
+  background: var(--cream);
+}
+
+.points-table .total-cell {
+  background: var(--gold);
+  color: var(--dark);
+  font-weight: 900;
+  font-size: 16px;
+}
+
+/* === NAVIGATION === */
+.site-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 56px;
+  background: rgba(26,58,26,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.nav-brand {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.nav-link:hover { background: rgba(255,255,255,0.1); color: var(--white); }
+.nav-link.active { background: rgba(201,168,76,0.15); color: var(--gold); }
+.nav-link svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+/* === DAY SELECTOR === */
+.day-selector-bar {
+  background: linear-gradient(135deg, var(--green-900), var(--green-800));
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 2px solid var(--green-700);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  position: relative;
+  z-index: 100;
+  margin-top: 56px;
+}
+
+.view-btn {
+  padding: 8px 16px;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.1);
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.view-btn:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: var(--gold-light);
+  transform: translateY(-1px);
+}
+
+.view-btn.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--dark);
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .titleist-header {
+    padding: 10px 20px;
+    gap: 12px;
+  }
+
+  .titleist-logo {
+    font-size: 22px;
+  }
+
+  .titleist-ball {
+    width: 30px;
+    height: 30px;
+    font-size: 11px;
+  }
+
+  .titleist-tagline {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-link span { display: none; }
+  .nav-link { padding: 8px 10px; }
+  .nav-brand { font-size: 10px; letter-spacing: 2px; }
+
+  .titleist-header {
+    padding: 8px 16px;
+    gap: 10px;
+  }
+
+  .titleist-logo {
+    font-size: 18px;
+  }
+
+  .titleist-tagline {
+    display: none;
+  }
+
+  .day-selector-bar {
+    padding: 8px 12px;
+    gap: 4px;
+  }
+
+  .view-btn {
+    font-size: 10px;
+    padding: 5px 8px;
+  }
+
+  .round-toggle {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .round-toggle-btn {
+    font-size: 10px;
+    padding: 6px 10px;
+  }
+}
+
+/* === WEEK VIEW LEADERBOARD === */
+.week-leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+  margin-top: 24px;
+  background: var(--white);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.week-leaderboard-table thead tr {
+  background: var(--green-800);
+}
+
+.week-leaderboard-table th {
+  color: var(--white);
+  padding: 16px 12px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border-right: 1px solid var(--green-700);
+}
+
+.week-leaderboard-table th:first-child {
+  text-align: left;
+  padding-left: 24px;
+  width: 60px;
+}
+
+.week-leaderboard-table th:nth-child(2) {
+  text-align: left;
+  width: 180px;
+}
+
+.week-leaderboard-table th.day-header {
+  background: var(--blue-accent);
+  font-size: 12px;
+}
+
+.week-leaderboard-table th.total-header {
+  background: var(--gold-dark);
+  font-size: 14px;
+  min-width: 100px;
+}
+
+.week-leaderboard-table tbody tr {
+  border-bottom: 2px solid var(--gray-200);
+  transition: background 0.2s;
+}
+
+.week-leaderboard-table tbody tr:hover {
+  background: var(--green-50);
+}
+
+.week-leaderboard-table tbody tr:nth-child(even) {
+  background: var(--cream);
+}
+
+.week-leaderboard-table tbody tr:nth-child(even):hover {
+  background: var(--green-50);
+}
+
+.week-leaderboard-table td {
+  padding: 18px 12px;
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 17px;
+  font-weight: 700;
+  border-right: 1px solid var(--gray-200);
+}
+
+.week-leaderboard-table td:first-child {
+  text-align: center;
+  font-size: 20px;
+  color: var(--gray-600);
+  width: 60px;
+  font-weight: 900;
+}
+
+.week-leaderboard-table td:nth-child(2) {
+  text-align: left;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 19px;
+  font-weight: 900;
+  color: var(--dark);
+  padding-left: 24px;
+}
+
+.week-leaderboard-table td.score-cell {
+  font-size: 18px;
+  color: var(--dark);
+}
+
+.week-leaderboard-table td.score-cell.under-par {
+  background: var(--red-accent);
+  color: var(--white);
+  font-weight: 900;
+}
+
+.week-leaderboard-table td.score-cell.even-par {
+  background: var(--gray-600);
+  color: var(--white);
+}
+
+.week-leaderboard-table td.score-cell.over-par {
+  color: var(--gray-600);
+}
+
+.week-leaderboard-table td.total-score {
+  background: var(--gold);
+  color: var(--dark);
+  font-size: 24px;
+  font-weight: 900;
+  border-left: 3px solid var(--gold-dark);
+}
+
+.week-leaderboard-table .position-1 td:first-child {
+  background: var(--gold);
+  color: var(--dark);
+  font-size: 24px;
+}
+
+.week-leaderboard-table .position-1 {
+  background: var(--gold-light) !important;
+}
+
+.week-leaderboard-table .position-2 td:first-child {
+  background: #c0c0c0;
+  color: var(--dark);
+  font-size: 22px;
+}
+
+.week-leaderboard-table .position-3 td:first-child {
+  background: #cd7f32;
+  color: var(--white);
+  font-size: 22px;
+}
+
+.score-to-par {
+  font-size: 13px;
+  color: var(--gray-400);
+  margin-left: 6px;
+  font-weight: 600;
+}
+
+.week-view-empty {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--gray-400);
+  font-size: 18px;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 1400px) {
+  .tracking-sections {
+    grid-template-columns: 1fr;
+  }
+
+  .points-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .week-leaderboard-table {
+    font-size: 14px;
+  }
+
+  .week-leaderboard-table td {
+    padding: 12px 8px;
+    font-size: 15px;
+  }
+
+  .week-leaderboard-table th {
+    padding: 12px 8px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .scorecard-table {
+    font-size: 12px;
+  }
+
+  .scorecard-table th,
+  .scorecard-table td {
+    padding: 6px 4px;
+  }
+
+  .week-leaderboard-table {
+    font-size: 12px;
+  }
+
+  .week-leaderboard-table td {
+    padding: 10px 6px;
+    font-size: 13px;
+  }
+
+  .day-selector-bar {
+    gap: 6px;
+    padding: 10px 16px;
+  }
+
+  .view-btn {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .round-toggle-btn {
+    font-size: 11px;
+    padding: 6px 12px;
+  }
+
+  .scorecard-container {
+    padding: 16px 12px 32px;
+  }
+
+  .course-info-bar {
+    padding: 14px 16px;
+    border-radius: 8px 8px 0 0;
+    flex-wrap: wrap;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="site-nav">
+  <a href="index.html" class="nav-brand">BuschLight Cup</a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Schedule</span>
+    </a>
+    <a href="instructions.html" class="nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <span>Rules</span>
+    </a>
+    <a href="scoring.html" class="nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>Live Scores</span>
+    </a>
+    <a href="daily-leaderboard.html" class="nav-link active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span>Leaderboard</span>
+    </a>
+  </div>
+</nav>
+
+<!-- View Controls Bar -->
+<div class="day-selector-bar">
+  <button class="view-btn active" onclick="showFullStandings()">Full Standings</button>
+  <button class="view-btn" onclick="showDay(1)">SUN</button>
+  <button class="view-btn" onclick="showDay(2)">MON</button>
+  <button class="view-btn" onclick="showDay(3)">TUE</button>
+  <button class="view-btn" onclick="showDay(4)">WED</button>
+  <button class="view-btn" onclick="showDay(5)">THU</button>
+  <button class="view-btn" onclick="showDay(6)">FRI</button>
+  <button class="view-btn" onclick="showDay(7)">SAT</button>
+</div>
+
+<!-- Titleist Header -->
+<div class="titleist-header">
+  <div class="titleist-ball">1</div>
+  <div class="titleist-logo">Titleist</div>
+  <div class="titleist-tagline">#1 ball in golf.</div>
+</div>
+
+<!-- Main Container -->
+<div class="scorecard-container">
+
+  <!-- WEEK VIEW -->
+  <div id="week-view" style="display:block">
+    <div class="course-info-bar">
+      <div class="course-name">BUSCH LIGHT CUP 2026</div>
+      <div class="course-meta">
+        <div class="course-meta-item">
+          <span class="course-meta-label">Tournament</span>
+          <span class="course-meta-value">Standings</span>
+        </div>
+        <div class="live-indicator">
+          <div class="live-dot"></div>
+          <span>LIVE</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="week-leaderboard-content">
+      <!-- Week leaderboard will be rendered here -->
+    </div>
+  </div>
+
+  <!-- DAY VIEW -->
+  <div id="day-view" style="display:none">
+    <div class="course-info-bar">
+      <div class="course-name" id="course-name">LAKE MARION</div>
+      <div class="course-meta">
+        <div class="course-meta-item">
+          <span class="course-meta-label">Format</span>
+          <span class="course-meta-value" id="format-name">123 Ball</span>
+        </div>
+        <div class="course-meta-item">
+          <span class="course-meta-label">Date</span>
+          <span class="course-meta-value" id="day-date">Sunday</span>
+        </div>
+        <div class="round-toggle">
+          <button class="round-toggle-btn active" onclick="switchRound(1)">Round 1<br><span style="font-size:10px;opacity:0.8">Holes 1-18</span></button>
+          <button class="round-toggle-btn" onclick="switchRound(2)">Round 2<br><span style="font-size:10px;opacity:0.8">Holes 19-36</span></button>
+        </div>
+        <div class="live-indicator">
+          <div class="live-dot"></div>
+          <span>LIVE</span>
+        </div>
+      </div>
+    </div>
+
+  <!-- Scorecard Table -->
+  <div class="scorecard-table-wrap">
+    <table class="scorecard-table">
+      <thead id="scorecard-thead">
+        <!-- Will be populated by JavaScript -->
+      </thead>
+      <tbody id="scorecard-tbody">
+        <!-- Will be populated by JavaScript -->
+        <tr class="handicap-row">
+          <td>HANDICAP</td>
+          <td>3</td><td>17</td><td>5</td><td>1</td><td>11</td><td>15</td><td>7</td><td>13</td><td>9</td>
+          <td></td>
+          <td>6</td><td>18</td><td>2</td><td>13</td><td>14</td><td>10</td><td>4</td><td>16</td><td>8</td>
+          <td></td>
+          <td></td><td></td><td></td>
+        </tr>
+        <tr class="par-row">
+          <td>PAR</td>
+          <td>5</td><td>3</td><td>4</td><td>5</td><td>4</td><td>3</td><td>4</td><td>4</td><td>4</td>
+          <td>36</td>
+          <td>4</td><td>3</td><td>4</td><td>4</td><td>4</td><td>5</td><td>3</td><td>5</td><td>3</td>
+          <td>36</td>
+          <td>72</td><td></td><td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Tracking Sections -->
+  <div class="tracking-sections">
+    <div class="tracking-card">
+      <div class="tracking-card-title green">LOW NET</div>
+      <div class="tracking-content" id="low-net-content">
+        <div class="tracking-row winner">
+          <span class="label">TROY</span>
+          <span class="value">9</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tracking-card">
+      <div class="tracking-card-title blue">BIRDIES</div>
+      <div class="tracking-content" id="birdies-content">
+        <div class="tracking-row">
+          <span class="label">Loading...</span>
+          <span class="value">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tracking-card">
+      <div class="tracking-card-title green">GREENIES</div>
+      <div class="tracking-content" id="greenies-content">
+        <div class="tracking-row">
+          <span class="label">Par 3 #2</span>
+          <span class="value">—</span>
+        </div>
+        <div class="tracking-row">
+          <span class="label">Par 3 #6</span>
+          <span class="value">—</span>
+        </div>
+        <div class="tracking-row">
+          <span class="label">Par 3 #11</span>
+          <span class="value">—</span>
+        </div>
+        <div class="tracking-row">
+          <span class="label">Par 3 #16</span>
+          <span class="value">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- end day-view -->
+
+</div><!-- end scorecard-container -->
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+// Firebase Config
+const firebaseConfig = {
+  apiKey: "AIzaSyC1soSELTncOWIeGa_oMJoWqTU7yKS1RHA",
+  authDomain: "buschlightcup.firebaseapp.com",
+  projectId: "buschlightcup",
+  storageBucket: "buschlightcup.firebasestorage.app",
+  messagingSenderId: "944255498477",
+  appId: "1:944255498477:web:4ffea8e79b6ca1e00fb4e4"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+const YEAR = 2026;
+const DEFAULT_PARS = [5,3,4,5,4,3,4,4,4, 4,3,4,4,4,5,3,5,3];
+const DEFAULT_HCP_ORDER = [3,17,5,1,11,15,7,13,9, 6,18,2,13,14,10,4,16,8];
+
+const DAYS = {
+  1: { name: 'Sunday', course: 'Lake Marion', format: '123 Ball', date: 'April 19, 2026' },
+  2: { name: 'Monday', course: 'Santee Cooper', format: '2 Man 1 Best Ball', date: 'April 20, 2026' },
+  3: { name: 'Tuesday', course: 'Wyboo', format: '4 Man Team Chicago', date: 'April 21, 2026' },
+  4: { name: 'Wednesday', course: 'Santee National', format: '4 Man 2 Best Balls', date: 'April 22, 2026' },
+  5: { name: 'Thursday', course: 'Players Course', format: '4 Man Designated Hole + 1 Best', date: 'April 23, 2026' },
+  6: { name: 'Friday', course: 'Lake Marion', format: 'Individual Chicago', date: 'April 24, 2026' },
+  7: { name: 'Saturday', course: 'TBD', format: 'Match Play', date: 'April 25, 2026' }
+};
+
+let allPlayers = [];
+let currentTeams = [];
+let currentDay = null;
+let currentRound = 1;
+let currentView = 'week';
+let scoresListener = null;
+let weekScoresListener = null;
+let courseData = { pars: DEFAULT_PARS, hcpOrder: DEFAULT_HCP_ORDER };
+
+// Load players from Firestore
+async function loadPlayers() {
+  try {
+    const snap = await db.collection('players').where('active', '==', true).get();
+    allPlayers = [];
+    snap.forEach(doc => {
+      allPlayers.push({
+        uid: doc.id,
+        name: doc.data().name,
+        email: doc.data().email,
+        handicap: doc.data().handicap || 0
+      });
+    });
+  } catch (err) {
+    console.error('Error loading players:', err);
+  }
+}
+
+// View Switching with Buttons
+function setActiveButton(clickedButton) {
+  document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  if (clickedButton) {
+    clickedButton.classList.add('active');
+  }
+}
+
+function showFullStandings() {
+  setActiveButton(event.target);
+  currentView = 'week';
+  currentDay = null;
+  currentRound = 1;
+  document.getElementById('week-view').style.display = 'block';
+  document.getElementById('day-view').style.display = 'none';
+  loadWeekView();
+}
+
+async function showDay(day) {
+  setActiveButton(event.target);
+  currentView = 'day';
+  currentDay = day;
+  currentRound = 1; // Default to Round 1
+  document.getElementById('week-view').style.display = 'none';
+  document.getElementById('day-view').style.display = 'block';
+
+  // Reset round toggle to Round 1
+  document.querySelectorAll('.round-toggle-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  document.querySelector('.round-toggle-btn:first-child').classList.add('active');
+
+  const dayInfo = DAYS[day];
+  document.getElementById('course-name').textContent = dayInfo.course.toUpperCase();
+  document.getElementById('format-name').textContent = dayInfo.format;
+  document.getElementById('day-date').textContent = dayInfo.name;
+
+  // Load teams for this day
+  await loadTeamsForDay(day);
+
+  loadCourseData(day).then(() => {
+    loadScores(day);
+  });
+}
+
+async function loadTeamsForDay(dayNum) {
+  try {
+    const doc = await db.collection('days').doc(`${YEAR}_day${dayNum}`).get();
+    if (doc.exists) {
+      currentTeams = doc.data().teams || [];
+    } else {
+      currentTeams = [];
+    }
+  } catch (err) {
+    console.error('Error loading teams:', err);
+    currentTeams = [];
+  }
+}
+
+function switchRound(round) {
+  currentRound = round;
+
+  // Update round toggle buttons
+  document.querySelectorAll('.round-toggle-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  event.target.classList.add('active');
+
+  // Reload scores for the current day with new round
+  if (currentDay) {
+    loadCourseData(currentDay).then(() => {
+      loadScores(currentDay);
+    });
+  }
+}
+
+// Auto-select today's day
+function tryAutoSelectDay() {
+  const TRIP_DATES = [
+    '2026-04-19', // Day 1 - SUN
+    '2026-04-20', // Day 2 - MON
+    '2026-04-21', // Day 3 - TUE
+    '2026-04-22', // Day 4 - WED
+    '2026-04-23', // Day 5 - THU
+    '2026-04-24', // Day 6 - FRI
+    '2026-04-25'  // Day 7 - SAT
+  ];
+
+  const DAY_ABBREV = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
+  const today = new Date().toISOString().slice(0, 10);
+  const dayIdx = TRIP_DATES.indexOf(today);
+
+  if (dayIdx >= 0) {
+    const dayAbbrev = DAY_ABBREV[dayIdx];
+    // Auto-select today's day button
+    const buttons = document.querySelectorAll('.view-btn');
+    buttons.forEach(btn => {
+      if (btn.textContent === dayAbbrev) {
+        btn.click();
+      }
+    });
+  } else {
+    // Default to week view
+    loadWeekView();
+  }
+}
+
+// Week View - Load all scores across all days
+async function loadWeekView() {
+  const container = document.getElementById('week-leaderboard-content');
+  container.innerHTML = '<div class="week-view-empty"><div class="spinner" style="margin:0 auto 12px"></div>Loading tournament standings...</div>';
+
+  // Unsubscribe from previous listener
+  if (weekScoresListener) weekScoresListener();
+
+  // Listen to all scores for the year
+  weekScoresListener = db.collection('scores')
+    .where('year', '==', YEAR)
+    .onSnapshot(snap => {
+      const allScores = [];
+      snap.forEach(doc => allScores.push(doc.data()));
+      renderWeekView(allScores);
+    }, err => {
+      console.error('Week view error:', err);
+      container.innerHTML = '<div class="week-view-empty">Error loading scores. Check connection.</div>';
+    });
+}
+
+function renderWeekView(allScores) {
+  const container = document.getElementById('week-leaderboard-content');
+
+  if (!allScores.length) {
+    container.innerHTML = '<div class="week-view-empty">No scores submitted yet.<br>Tournament standings will appear here as players complete rounds.</div>';
+    return;
+  }
+
+  // Group scores by player
+  const playerScores = {};
+
+  allScores.forEach(score => {
+    const uid = score.uid;
+    const playerName = score.playerName || score.email;
+
+    if (!playerScores[uid]) {
+      playerScores[uid] = {
+        name: playerName,
+        scores: {},
+        totalNet: 0,
+        totalGross: 0,
+        roundsPlayed: 0
+      };
+    }
+
+    const dayRoundKey = `${score.dayNumber}_${score.roundNumber || 1}`;
+    playerScores[uid].scores[dayRoundKey] = {
+      net: score.netTotal || 0,
+      gross: score.grossTotal || 0,
+      holesCompleted: score.holesCompleted || 0
+    };
+
+    if (score.holesCompleted === 18) {
+      playerScores[uid].totalNet += score.netTotal || 0;
+      playerScores[uid].totalGross += score.grossTotal || 0;
+      playerScores[uid].roundsPlayed++;
+    }
+  });
+
+  // Convert to array and sort by total net score
+  const playersArray = Object.values(playerScores);
+  playersArray.sort((a, b) => {
+    if (b.roundsPlayed !== a.roundsPlayed) return b.roundsPlayed - a.roundsPlayed;
+    return a.totalNet - b.totalNet;
+  });
+
+  // Build table
+  let html = '<table class="week-leaderboard-table"><thead><tr>';
+  html += '<th>POS</th>';
+  html += '<th>PLAYER</th>';
+
+  // Add columns for each day/round
+  for (let day = 1; day <= 7; day++) {
+    html += `<th class="day-header">Day ${day}<br>R1</th>`;
+    // Check if any day has round 2 scores
+    const hasRound2 = allScores.some(s => s.dayNumber === day && s.roundNumber === 2);
+    if (hasRound2) {
+      html += `<th class="day-header">Day ${day}<br>R2</th>`;
+    }
+  }
+
+  html += '<th class="total-header">TOTAL</th>';
+  html += '</tr></thead><tbody>';
+
+  playersArray.forEach((player, idx) => {
+    const position = idx + 1;
+    const posClass = position === 1 ? 'position-1' : position === 2 ? 'position-2' : position === 3 ? 'position-3' : '';
+
+    html += `<tr class="${posClass}">`;
+    html += `<td>${position}</td>`;
+    html += `<td>${escapeHtml(player.name)}</td>`;
+
+    // Add day/round scores
+    for (let day = 1; day <= 7; day++) {
+      const r1Key = `${day}_1`;
+      const r2Key = `${day}_2`;
+
+      const r1Score = player.scores[r1Key];
+      if (r1Score && r1Score.holesCompleted === 18) {
+        const toPar = r1Score.net - 72;
+        const scoreClass = toPar < 0 ? 'under-par' : toPar === 0 ? 'even-par' : 'over-par';
+        html += `<td class="score-cell ${scoreClass}">${r1Score.net}</td>`;
+      } else {
+        html += `<td class="score-cell">—</td>`;
+      }
+
+      // Round 2 if exists
+      const hasRound2 = allScores.some(s => s.dayNumber === day && s.roundNumber === 2);
+      if (hasRound2) {
+        const r2Score = player.scores[r2Key];
+        if (r2Score && r2Score.holesCompleted === 18) {
+          const toPar = r2Score.net - 72;
+          const scoreClass = toPar < 0 ? 'under-par' : toPar === 0 ? 'even-par' : 'over-par';
+          html += `<td class="score-cell ${scoreClass}">${r2Score.net}</td>`;
+        } else {
+          html += `<td class="score-cell">—</td>`;
+        }
+      }
+    }
+
+    // Total score
+    const totalToPar = player.totalNet - (72 * player.roundsPlayed);
+    const toParStr = totalToPar === 0 ? 'E' : totalToPar > 0 ? `+${totalToPar}` : totalToPar.toString();
+    html += `<td class="total-score">${toParStr}</td>`;
+    html += `</tr>`;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+async function loadCourseData(dayNum) {
+  try {
+    const doc = await db.collection('courses').doc(`${YEAR}_day${dayNum}`).get();
+    if (doc.exists) {
+      const d = doc.data();
+      courseData.pars = d.pars || DEFAULT_PARS;
+      courseData.hcpOrder = d.hcpOrder || DEFAULT_HCP_ORDER;
+    } else {
+      courseData = { pars: DEFAULT_PARS, hcpOrder: DEFAULT_HCP_ORDER };
+    }
+
+    // Update table header and rows
+    updateTableHeader();
+    updateHeaderRows();
+  } catch (err) {
+    console.error('Error loading course data:', err);
+    courseData = { pars: DEFAULT_PARS, hcpOrder: DEFAULT_HCP_ORDER };
+    updateTableHeader();
+    updateHeaderRows();
+  }
+}
+
+function updateTableHeader() {
+  const thead = document.getElementById('scorecard-thead');
+  const holeOffset = currentRound === 2 ? 18 : 0;
+
+  let html = '<tr><th>NAME / PAR</th>';
+
+  // Front 9
+  for (let i = 1; i <= 9; i++) {
+    html += `<th class="front-nine-header">${i + holeOffset}</th>`;
+  }
+  html += '<th class="front-nine-header">OUT</th>';
+
+  // Back 9
+  for (let i = 10; i <= 18; i++) {
+    html += `<th class="back-nine-header">${i + holeOffset}</th>`;
+  }
+  html += '<th class="back-nine-header">IN</th>';
+
+  html += '<th class="totals-header">GROSS</th>';
+  html += '<th class="totals-header">HCP</th>';
+  html += '<th class="totals-header">NET</th>';
+  html += '</tr>';
+
+  thead.innerHTML = html;
+}
+
+function updateHeaderRows() {
+  const tbody = document.getElementById('scorecard-tbody');
+
+  // Build handicap row
+  let hcpHTML = '<tr class="handicap-row"><td>HANDICAP</td>';
+  courseData.hcpOrder.forEach((h, i) => {
+    hcpHTML += `<td>${h}</td>`;
+    if (i === 8) hcpHTML += '<td></td>'; // OUT column
+  });
+  hcpHTML += '<td></td><td></td><td></td><td></td></tr>';
+
+  // Build par row
+  let parHTML = '<tr class="par-row"><td>PAR</td>';
+  let frontTotal = 0, backTotal = 0;
+  courseData.pars.forEach((p, i) => {
+    parHTML += `<td>${p}</td>`;
+    if (i < 9) frontTotal += p;
+    else backTotal += p;
+    if (i === 8) parHTML += `<td>${frontTotal}</td>`;
+  });
+  parHTML += `<td>${backTotal}</td><td>${frontTotal + backTotal}</td><td></td><td></td></tr>`;
+
+  tbody.innerHTML = hcpHTML + parHTML;
+}
+
+function loadScores(dayNum) {
+  // Unsubscribe from previous listener
+  if (scoresListener) scoresListener();
+
+  // Listen to scores for this day and round
+  scoresListener = db.collection('scores')
+    .where('year', '==', YEAR)
+    .where('dayNumber', '==', dayNum)
+    .where('roundNumber', '==', currentRound)
+    .onSnapshot(snap => {
+      const allScores = [];
+      snap.forEach(doc => allScores.push(doc.data()));
+      renderScorecard(allScores);
+      calculateStats(allScores);
+    }, err => {
+      console.error('Error loading scores:', err);
+    });
+}
+
+function renderScorecard(scores) {
+  const tbody = document.getElementById('scorecard-tbody');
+
+  // Preserve header rows
+  const hcpRow = tbody.querySelector('.handicap-row');
+  const parRow = tbody.querySelector('.par-row');
+  tbody.innerHTML = '';
+  if (hcpRow) tbody.appendChild(hcpRow);
+  if (parRow) tbody.appendChild(parRow);
+
+  // Handle empty scores
+  if (!scores || scores.length === 0) {
+    const emptyRow = document.createElement('tr');
+    emptyRow.innerHTML = '<td colspan="24" style="text-align:center;padding:40px 20px;color:var(--gray-400);font-size:16px">No scores submitted yet for this round.<br><span style="font-size:14px;margin-top:8px;display:inline-block">Scores will appear here once players start submitting.</span></td>';
+    tbody.appendChild(emptyRow);
+    return;
+  }
+
+  // If no teams configured, show all players
+  if (!currentTeams || currentTeams.length === 0) {
+    const playerNames = scores.map(s => s.playerName).filter(name => name);
+    if (playerNames.length === 0) {
+      const emptyRow = document.createElement('tr');
+      emptyRow.innerHTML = '<td colspan="24" style="text-align:center;padding:40px 20px;color:var(--gray-400)">No player data available.</td>';
+      tbody.appendChild(emptyRow);
+      return;
+    }
+    renderTeam(tbody, scores, playerNames, 'ALL PLAYERS');
+    return;
+  }
+
+  // Render each team
+  currentTeams.forEach((teamPlayers, idx) => {
+    if (idx > 0) {
+      // Team divider
+      const divRow = document.createElement('tr');
+      divRow.className = 'team-divider';
+      divRow.innerHTML = '<td colspan="24"></td>';
+      tbody.appendChild(divRow);
+    }
+
+    const teamScores = scores.filter(s =>
+      teamPlayers.some(tp => tp.toUpperCase() === s.playerName?.toUpperCase())
+    );
+    renderTeam(tbody, teamScores, teamPlayers, `TEAM ${idx + 1}`);
+  });
+}
+
+function renderTeam(tbody, teamScores, teamPlayers, teamName) {
+  teamPlayers.forEach(playerName => {
+    const scoreData = teamScores.find(s => s.playerName?.toUpperCase() === playerName?.toUpperCase());
+    const tr = document.createElement('tr');
+    tr.className = 'player-row';
+
+    // Use the name from scoreData if available, otherwise use playerName from teams
+    const displayName = scoreData?.playerName || playerName;
+    let html = `<td>${displayName.toUpperCase()}</td>`;
+
+    // Holes 1-9
+    let frontTotal = 0;
+    for (let i = 0; i < 9; i++) {
+      const score = scoreData?.holes?.[i] || 0;
+      const par = courseData.pars[i];
+      const cellClass = getScoreClass(score, par);
+      html += `<td class="${cellClass}">${score || '—'}</td>`;
+      if (score) frontTotal += score;
+    }
+    html += `<td class="totals-cell">${frontTotal || '—'}</td>`;
+
+    // Holes 10-18
+    let backTotal = 0;
+    for (let i = 9; i < 18; i++) {
+      const score = scoreData?.holes?.[i] || 0;
+      const par = courseData.pars[i];
+      const cellClass = getScoreClass(score, par);
+      html += `<td class="${cellClass}">${score || '—'}</td>`;
+      if (score) backTotal += score;
+    }
+    html += `<td class="totals-cell">${backTotal || '—'}</td>`;
+
+    // Totals
+    const gross = scoreData?.grossTotal || 0;
+    const hcp = scoreData?.handicap || 0;
+    const net = scoreData?.netTotal || 0;
+
+    html += `<td class="totals-cell">${gross || '—'}</td>`;
+    html += `<td>${hcp || '—'}</td>`;
+    html += `<td class="totals-cell">${net || '—'}</td>`;
+
+    tr.innerHTML = html;
+    tbody.appendChild(tr);
+  });
+}
+
+function getScoreClass(score, par) {
+  if (!score || score === 0) return '';
+  const diff = score - par;
+  if (diff <= -2) return 'score-eagle';
+  if (diff === -1) return 'score-birdie';
+  if (diff === 0) return 'score-par';
+  if (diff === 1) return 'score-bogey';
+  return '';
+}
+
+function calculateStats(scores) {
+  // Low Net
+  const withScores = scores.filter(s => s.holesCompleted > 0);
+  if (withScores.length > 0) {
+    const lowNet = withScores.reduce((a, b) => a.netTotal < b.netTotal ? a : b);
+    document.getElementById('low-net-content').innerHTML = `
+      <div class="tracking-row winner">
+        <span class="label">${lowNet.playerName?.toUpperCase() || '—'}</span>
+        <span class="value">${lowNet.netTotal}</span>
+      </div>
+    `;
+  }
+
+  // Birdies - count all birdies
+  const birdieCount = {};
+  scores.forEach(s => {
+    if (!s.holes) return;
+    let count = 0;
+    s.holes.forEach((score, idx) => {
+      if (score && score === courseData.pars[idx] - 1) {
+        count++;
+      }
+    });
+    if (count > 0) {
+      birdieCount[s.playerName] = count;
+    }
+  });
+
+  let birdiesHTML = '';
+  Object.keys(birdieCount).forEach(name => {
+    birdiesHTML += `
+      <div class="tracking-row">
+        <span class="label">${name?.toUpperCase() || '—'}</span>
+        <span class="value">${birdieCount[name]}</span>
+      </div>
+    `;
+  });
+
+  if (birdiesHTML) {
+    document.getElementById('birdies-content').innerHTML = birdiesHTML;
+  } else {
+    document.getElementById('birdies-content').innerHTML = `
+      <div class="tracking-row">
+        <span class="label">No birdies yet</span>
+        <span class="value">—</span>
+      </div>
+    `;
+  }
+}
+
+// Auto-refresh every 30 seconds
+setInterval(() => {
+  if (currentView === 'week') {
+    // Week view auto-refreshes via Firestore listener
+  } else if (currentDay) {
+    // Day view will auto-refresh via Firestore listener
+  }
+}, 30000);
+
+// Initialize
+loadPlayers().then(() => {
+  tryAutoSelectDay();
+});
+</script>
+
+</body>
+</html>

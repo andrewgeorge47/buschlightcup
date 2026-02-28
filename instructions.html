@@ -575,6 +575,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       <span>Live Scores</span>
     </a>
+    <a href="daily-leaderboard.html" class="nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span>Leaderboard</span>
+    </a>
   </div>
 </nav>
 
@@ -686,28 +690,37 @@
         <span class="tag tag-team">Team Format</span>
         <span class="tag tag-net">Net Scores</span>
 
-        <p>Two 4-man teams compete head-to-head. On every hole, the number of scores that count rotates in a 1-2-3 pattern. Three separate competitions run simultaneously: front 9, back 9, and 18-hole total.</p>
+        <p>Two 4-man teams compete head-to-head. The number of scores that count depends on the par of the hole: 1 score on par 5s, 2 scores on par 4s, and 3 scores on par 3s. Three separate competitions run simultaneously: front 9, back 9, and 18-hole total.</p>
 
         <div class="how-it-works">
-          <h5>How It Works — The Rotation</h5>
-          <p style="font-size:13px;margin-bottom:10px;color:var(--gray-600)">The number of scores counted per team follows the hole number. The pattern repeats every 3 holes:</p>
+          <h5>How It Works — Par-Based Scoring</h5>
+          <p style="font-size:13px;margin-bottom:10px;color:var(--gray-600)">The number of scores counted per team is determined by the par of each hole:</p>
           <table class="chicago-table">
-            <thead><tr><th>Holes</th><th>Scores Counted</th><th>Hole Examples</th></tr></thead>
+            <thead><tr><th>Hole Type</th><th>Scores Counted</th><th>Description</th></tr></thead>
             <tbody>
-              <tr><td><strong>1</strong> Best Net</td><td>Only the single lowest net score on your team counts</td><td>1, 4, 7, 10, 13, 16</td></tr>
-              <tr><td><strong>2</strong> Best Nets</td><td>The two lowest net scores are added together</td><td>2, 5, 8, 11, 14, 17</td></tr>
-              <tr><td><strong>3</strong> Best Nets</td><td>The three lowest net scores are added together</td><td>3, 6, 9, 12, 15, 18</td></tr>
+              <tr><td><strong>Par 5s</strong></td><td>1 score</td><td>Only the single lowest net score on your team counts</td></tr>
+              <tr><td><strong>Par 4s</strong></td><td>2 scores</td><td>The two lowest net scores are added together</td></tr>
+              <tr><td><strong>Par 3s</strong></td><td>3 scores</td><td>The three lowest net scores are added together</td></tr>
             </tbody>
           </table>
         </div>
 
         <div class="example-box">
-          <div class="ex-label">Example — Hole 3 (count 3 best nets, par 4)</div>
-          Player A: gross 5, handicap strokes on this hole = 1 → net 4<br>
-          Player B: gross 4, no strokes → net 4<br>
-          Player C: gross 6, 1 stroke → net 5<br>
+          <div class="ex-label">Example — Hole 2 (par 3, count 3 best nets)</div>
+          Player A: gross 4, handicap strokes on this hole = 1 → net 3<br>
+          Player B: gross 3, no strokes → net 3<br>
+          Player C: gross 5, 1 stroke → net 4<br>
+          Player D: gross 6, 2 strokes → net 4<br>
+          <strong>Team score = 3 + 3 + 4 = 10</strong>
+        </div>
+
+        <div class="example-box">
+          <div class="ex-label">Example — Hole 4 (par 5, count 1 best net)</div>
+          Player A: gross 6, 1 stroke → net 5<br>
+          Player B: gross 5, no strokes → net 5<br>
+          Player C: gross 7, 1 stroke → net 6<br>
           Player D: gross 7, 2 strokes → net 5<br>
-          <strong>Team score = 4 + 4 + 5 = 13</strong>
+          <strong>Team score = 5</strong> (any of the three 5s count)
         </div>
 
         <div class="highlight-box">
@@ -856,20 +869,43 @@
         <span class="tag tag-team">Team Format</span>
         <span class="tag tag-net">Net Scores</span>
 
-        <p>A twist on best-ball formats. On most holes, only the single best net score from the team counts. However, on <strong>designated holes</strong> (determined before the round), all 4 players' net scores count.</p>
+        <p>Each player has designated holes where their score automatically counts, determined by team handicap rankings. On every hole, one designated player's score counts PLUS the single best net score from the team.</p>
 
         <div class="how-it-works">
-          <h5>How It Works</h5>
+          <h5>Handicap-Based Hole Assignments</h5>
+          <p style="font-size:13px;margin-bottom:10px;color:var(--gray-600)">Before teeing off, rank your team by handicap. Each player is automatically designated for specific holes:</p>
+          <table class="chicago-table">
+            <thead><tr><th>Handicap Rank</th><th>Designated Holes</th><th>Number of Holes</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Low Handicap</strong> (best player)</td><td>Holes 1, 2, 3, 4, 5</td><td>5 holes</td></tr>
+              <tr><td><strong>2nd Low Handicap</strong></td><td>Holes 6, 7, 8, 9, 10</td><td>5 holes</td></tr>
+              <tr><td><strong>3rd Low Handicap</strong></td><td>Holes 11, 12, 13, 14</td><td>4 holes</td></tr>
+              <tr><td><strong>4th Low Handicap</strong> (highest)</td><td>Holes 15, 16, 17, 18</td><td>4 holes</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="how-it-works" style="margin-top:12px">
+          <h5>Scoring Each Hole</h5>
           <ol class="step-list">
-            <li>Before teeing off, agree on which holes are the "designated holes" (typically 2–4 holes per 9).</li>
-            <li>On regular holes: only the single lowest net score counts for the team.</li>
-            <li>On designated holes: all 4 net scores are added together.</li>
-            <li>Front 9, back 9, and 18-hole totals are all separate competitions.</li>
+            <li>Identify which player's designated hole it is based on handicap rankings.</li>
+            <li>That designated player's net score automatically counts.</li>
+            <li>Also count the single best net score from all 4 players on the team.</li>
+            <li>Add these two scores together for the team's hole score.</li>
           </ol>
         </div>
 
-        <div class="highlight-box" style="margin-top:0">
-          <strong>Strategy note:</strong> Designated holes dramatically increase the weight of those holes. Everyone must play well on them — there's no hiding behind a better partner's score.<br><br>
+        <div class="example-box">
+          <div class="ex-label">Example — Hole 7 (par 4) — 2nd Low Handicap's Designated Hole</div>
+          Low Hcp (Player A): net 4<br>
+          2nd Low (Player B - designated): net 5<br>
+          3rd Low (Player C): net 6<br>
+          4th Low (Player D): net 5<br>
+          <strong>Team score = 5 (designated) + 4 (best) = 9</strong>
+        </div>
+
+        <div class="highlight-box" style="margin-top:12px">
+          <strong>Strategy note:</strong> Every player has pressure holes where they MUST perform. Can't hide a bad round — your designated holes will count no matter what.<br><br>
           <strong>Payout:</strong> $16 per 9-hole win + $16 for 18-hole total. $32 in skins. Total purse: <strong>$80</strong>
         </div>
       </div>
@@ -957,6 +993,248 @@
     </div>
 
   </div><!-- end day-formats -->
+
+  <!-- OPTIONS FOR HOLES 19-36 -->
+  <div class="section-header" style="margin-top:80px">
+    <div class="section-label">Replay Options</div>
+    <h2 class="section-title">Optional Games for Holes 19–36</h2>
+  </div>
+
+  <p style="font-size:15px;line-height:1.7;color:var(--gray-600);margin-bottom:32px">
+    Want to play more golf after your 18-hole round? Here are side games perfect for replay rounds or bonus holes. Pick one or mix and match!
+  </p>
+
+  <div class="day-formats">
+
+    <!-- 3-4-5 -->
+    <div class="format-card">
+      <div class="format-header">
+        <div class="format-day-num"><span class="num" style="font-size:28px">3-4-5</span><span class="lbl">Game</span></div>
+        <div class="format-header-info">
+          <div class="format-day-name">3-4-5</div>
+          <div class="format-name">Three Separate Competitions by Par</div>
+          <div class="format-course">All Skill Levels &bull; Great for Mixed Handicaps</div>
+        </div>
+      </div>
+      <div class="format-body">
+        <span class="tag tag-individual">Individual Format</span>
+
+        <p>Looking for a simple side game that keeps everyone engaged from the first tee to the final putt? 3-4-5 is an easy, fast-moving betting game that works with any size group and adds strategy without slowing down play.</p>
+
+        <div class="how-it-works">
+          <h5>How It Works</h5>
+          <ol class="step-list">
+            <li>Before the round, agree on the wager amount and decide whether scoring will be gross or net (net recommended for groups with varying handicaps).</li>
+            <li>Track your cumulative scores separately for all Par 3s, all Par 4s, and all Par 5s.</li>
+            <li>Each category is its own mini-game, creating three distinct chances to win during the round.</li>
+            <li>At the end of 18 holes, the player with the lowest total on Par 3s wins one share, lowest on Par 4s wins another, and lowest on Par 5s wins the third.</li>
+          </ol>
+        </div>
+
+        <div class="example-box">
+          <div class="ex-label">Example — 18 Holes Completed</div>
+          John: Par 3s total = 15, Par 4s total = 42, Par 5s total = 21<br>
+          Troy: Par 3s total = 13, Par 4s total = 40, Par 5s total = 23<br>
+          <strong>Troy wins Par 3s. Troy wins Par 4s. John wins Par 5s.</strong>
+        </div>
+
+        <div class="highlight-box">
+          <strong>Perfect for:</strong> All skill levels, mixed handicaps, and groups who want multiple chances to win during the round.
+        </div>
+      </div>
+    </div>
+
+    <!-- Shamble -->
+    <div class="format-card">
+      <div class="format-header">
+        <div class="format-day-num"><span class="num" style="font-size:22px">SHM</span><span class="lbl">Game</span></div>
+        <div class="format-header-info">
+          <div class="format-day-name">Shamble</div>
+          <div class="format-name">Best Drive, Then Individual Play</div>
+          <div class="format-course">2, 3, or 4-Person Teams</div>
+        </div>
+      </div>
+      <div class="format-body">
+        <span class="tag tag-team">Team Format</span>
+
+        <p>A twist on scramble format that rewards good driving while keeping everyone involved throughout the hole.</p>
+
+        <div class="how-it-works">
+          <h5>How It Works</h5>
+          <ol class="step-list">
+            <li>All team members hit a tee shot.</li>
+            <li>The team selects the best tee shot from the group.</li>
+            <li>Everyone plays their own ball from that best drive location to finish the hole.</li>
+            <li>Use the best individual score(s) from the team for scoring — typically 1 or 2 best balls depending on team size.</li>
+          </ol>
+        </div>
+
+        <div class="example-box">
+          <div class="ex-label">Example — Hole 1 (par 4)</div>
+          All 4 players drive. Troy's drive goes 280 yards down the middle.<br>
+          Everyone moves to Troy's ball and plays their own from there.<br>
+          Team scores: 4, 5, 5, 6 → Count 2 best = <strong>4 + 5 = 9</strong>
+        </div>
+
+        <div class="highlight-box">
+          <strong>Strategy:</strong> Great for relaxed rounds. Rewards long hitters but keeps pressure on everyone to finish strong.
+        </div>
+      </div>
+    </div>
+
+    <!-- 2-Person Alt Shot -->
+    <div class="format-card">
+      <div class="format-header">
+        <div class="format-day-num"><span class="num" style="font-size:22px">ALT</span><span class="lbl">Game</span></div>
+        <div class="format-header-info">
+          <div class="format-day-name">2-Person Alternate Shot</div>
+          <div class="format-name">Foursomes / Alternating Shots</div>
+          <div class="format-course">2-Person Teams</div>
+        </div>
+      </div>
+      <div class="format-body">
+        <span class="tag tag-team">Team Format</span>
+        <span class="tag tag-net">Net Scores</span>
+
+        <p>Classic alternate shot format. One ball per team, partners take turns hitting shots until the ball is holed.</p>
+
+        <div class="how-it-works">
+          <h5>How It Works</h5>
+          <ol class="step-list">
+            <li>The team gets an average handicap of the two players (add both handicaps, divide by 2).</li>
+            <li>Partners decide who tees off on odd holes and who tees off on even holes.</li>
+            <li>Players alternate shots until the ball is holed. Player A hits tee shot, Player B hits second shot, Player A hits third shot, etc.</li>
+            <li>The team's net score (gross minus handicap strokes) determines winners.</li>
+          </ol>
+        </div>
+
+        <div class="example-box">
+          <div class="ex-label">Example — Hole 1</div>
+          Player A (12 hcp) + Player B (18 hcp) → Team handicap = 15<br>
+          Player A tees off → Player B hits approach → Player A putts → holed in 4<br>
+          Gross 4, net = 4 minus handicap strokes on this hole
+        </div>
+
+        <div class="highlight-box">
+          <strong>Strategy:</strong> Communication and trust are key. You're stuck with your partner's shots — for better or worse!
+        </div>
+      </div>
+    </div>
+
+    <!-- Rolly Polly 3 Putt -->
+    <div class="format-card">
+      <div class="format-header">
+        <div class="format-day-num"><span class="num" style="font-size:20px">R-P</span><span class="lbl">Game</span></div>
+        <div class="format-header-info">
+          <div class="format-day-name">Rolly Polly 3-Putt</div>
+          <div class="format-name">Penalty for 3-Putts, Reward for Long Putts</div>
+          <div class="format-course">Any Group Size</div>
+        </div>
+      </div>
+      <div class="format-body">
+        <span class="tag tag-individual">Individual Format</span>
+
+        <p>Here's a simple and fun game you can play with any group. You get penalized for 3-putts (or more) and rewarded for making a putt longer than the flagstick.</p>
+
+        <div class="how-it-works">
+          <h5>How It Works</h5>
+          <ol class="step-list">
+            <li>Before starting the round, decide how much each event will be worth (e.g., $1.00).</li>
+            <li>If you three-putt, you owe each of your playing partners a dollar.</li>
+            <li>If you make a "Polly" (putt longer than the flagstick height, approx. 7 feet), you collect a dollar from each playing partner.</li>
+            <li>At the end of the round, settle up based on everyone's running total.</li>
+          </ol>
+        </div>
+
+        <div class="highlight-box">
+          <strong>Game improvement bonus:</strong> There will be no "gimmies" — every putt matters! That's what makes this a game improvement side game.
+        </div>
+      </div>
+    </div>
+
+    <!-- Hi-Lo -->
+    <div class="format-card">
+      <div class="format-header">
+        <div class="format-day-num"><span class="num" style="font-size:20px">HI-LO</span><span class="lbl">Game</span></div>
+        <div class="format-header-info">
+          <div class="format-day-name">Hi-Lo (High-Low)</div>
+          <div class="format-name">Low Ball & High Ball Scoring</div>
+          <div class="format-course">4-Person Groups (2 vs 2)</div>
+        </div>
+      </div>
+      <div class="format-body">
+        <span class="tag tag-team">Team Format</span>
+
+        <p>A 2-vs-2 team game for groups of four golfers. All four golfers play their own balls into the hole (normal stroke play). On each hole, the two sides compare both their low balls AND their high balls.</p>
+
+        <div class="how-it-works">
+          <h5>How Points Are Awarded</h5>
+          <table class="chicago-table">
+            <thead><tr><th>Category</th><th>Winner</th><th>Points</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Low Ball</strong></td><td>Side with the better low-ball score (lowest individual score)</td><td>1 point</td></tr>
+              <tr><td><strong>High Ball</strong></td><td>Side with the better high-ball score (best of the two weaker scores)</td><td>1 point</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="example-box">
+          <div class="ex-label">Example — Hole 5 (par 4)</div>
+          <strong>Team 1:</strong> Player A = 4, Player B = 6<br>
+          <strong>Team 2:</strong> Player C = 5, Player D = 5<br><br>
+          Low Ball: Team 1 wins (4 beats 5) → 1 point<br>
+          High Ball: Team 2 wins (5 beats 6) → 1 point<br>
+          <strong>Hole ties 1-1</strong>
+        </div>
+
+        <div class="highlight-box">
+          <strong>Strategy:</strong> Both partners matter on every hole. You can't just rely on your better player — the weaker score can win or lose points too.
+        </div>
+      </div>
+    </div>
+
+    <!-- Wolf -->
+    <div class="format-card">
+      <div class="format-header">
+        <div class="format-day-num"><span class="num" style="font-size:24px">WOLF</span><span class="lbl">Game</span></div>
+        <div class="format-header-info">
+          <div class="format-day-name">Wolf</div>
+          <div class="format-name">Individual Betting Game with Rotating Partners</div>
+          <div class="format-course">4-Person Groups</div>
+        </div>
+      </div>
+      <div class="format-body">
+        <span class="tag tag-individual">Individual Format</span>
+
+        <p>A strategic betting game where players rotate being the "Wolf" who chooses a partner on each hole — or goes it alone for double points.</p>
+
+        <div class="how-it-works">
+          <h5>How It Works</h5>
+          <ol class="step-list">
+            <li>Determine the order of play (stays the same all round). The Wolf rotates: Player 1 is Wolf on holes 1, 5, 9, 13, 17. Player 2 on holes 2, 6, 10, 14, 18. Etc.</li>
+            <li>On each hole, the Wolf tees off first, then watches the other three players hit their tee shots in order.</li>
+            <li>After each player hits, the Wolf must decide whether to choose that player as a partner (immediately) or wait to see the next player. Once you pass, you can't go back.</li>
+            <li>If the Wolf chooses a partner, it's 2 vs 2 for that hole. If the Wolf doesn't choose anyone, they play alone (Lone Wolf) against the other three for double points.</li>
+            <li>The team with the lowest best-ball score wins the hole. Points: Normal win = 1 point per player. Lone Wolf win = 3 points (opponents get 0). Lone Wolf loss = opponents get 1 point each.</li>
+          </ol>
+        </div>
+
+        <div class="example-box">
+          <div class="ex-label">Example — Hole 1</div>
+          John is Wolf, tees off first.<br>
+          Troy tees off second → John chooses Troy as partner.<br>
+          Now it's John & Troy vs. Andrew & Jeff for the hole.<br>
+          Best ball: John/Troy = 4, Andrew/Jeff = 5<br>
+          <strong>John and Troy each win 1 point</strong>
+        </div>
+
+        <div class="highlight-box">
+          <strong>Strategy:</strong> Going Lone Wolf is high risk, high reward. Great drivers put pressure on the Wolf early — but a bad drive might make the Wolf wait for a better partner.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end optional formats -->
 
   <!-- HANDICAP EXPLAINER -->
   <div class="handicap-section">

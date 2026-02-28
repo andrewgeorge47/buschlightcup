@@ -46,7 +46,6 @@ body {
   min-height: 100vh;
 }
 
-/* === NAV === */
 .site-nav {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -94,11 +93,9 @@ body {
   .nav-brand { font-size: 10px; letter-spacing: 2px; }
 }
 
-/* === SCREENS === */
 .screen { display: none; min-height: 100vh; padding-top: 56px; }
 .screen.active { display: block; }
 
-/* === AUTH GATE === */
 .auth-gate {
   display: flex;
   align-items: center;
@@ -139,7 +136,7 @@ body {
   margin-bottom: 6px;
 }
 
-.form-input {
+.form-input, .form-textarea {
   width: 100%;
   padding: 11px 14px;
   border: 2px solid var(--gray-200);
@@ -153,7 +150,9 @@ body {
   -webkit-appearance: none;
 }
 
-.form-input:focus { border-color: var(--green-500); }
+.form-textarea { resize: vertical; min-height: 80px; }
+
+.form-input:focus, .form-textarea:focus { border-color: var(--green-500); }
 
 .btn {
   display: inline-flex;
@@ -191,7 +190,6 @@ body {
 .alert-error { background: var(--red-light); color: var(--red-accent); border: 1px solid #f8bbd0; }
 .alert-success { background: var(--green-100); color: var(--green-800); border: 1px solid var(--green-300); }
 
-/* === ADMIN LAYOUT === */
 .admin-layout {
   display: grid;
   grid-template-columns: 220px 1fr;
@@ -245,7 +243,6 @@ body {
 
 .main-content { padding: 32px; overflow-y: auto; }
 
-/* Panel system */
 .panel { display: none; }
 .panel.active { display: block; }
 
@@ -269,7 +266,6 @@ body {
   margin-top: 2px;
 }
 
-/* Cards */
 .card {
   background: var(--white);
   border-radius: 12px;
@@ -287,7 +283,6 @@ body {
   margin-bottom: 16px;
 }
 
-/* Player Table */
 .player-table {
   width: 100%;
   border-collapse: collapse;
@@ -314,7 +309,6 @@ body {
 
 .player-table tr:last-child td { border-bottom: none; }
 .player-table tr:hover td { background: var(--green-50); }
-
 .player-table td:first-child { font-weight: 600; color: var(--dark); }
 
 .badge {
@@ -327,9 +321,6 @@ body {
 
 .badge-active { background: var(--green-100); color: var(--green-700); }
 .badge-inactive { background: var(--gray-100); color: var(--gray-400); }
-
-/* Inline edit */
-.inline-edit { display: flex; align-items: center; gap: 8px; }
 
 .inline-input {
   padding: 5px 10px;
@@ -344,51 +335,19 @@ body {
 
 .inline-input:focus { border-color: var(--green-500); }
 
-/* Add Player Form */
-.add-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr 120px auto;
-  gap: 10px;
-  align-items: end;
-}
-
-.add-form-group { display: flex; flex-direction: column; gap: 4px; }
-.add-form-group label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--gray-400); }
-.add-form-group input {
-  padding: 9px 12px;
-  border: 2px solid var(--gray-200);
-  border-radius: 8px;
-  font-size: 14px;
-  font-family: inherit;
-  outline: none;
-  color: var(--dark);
-}
-.add-form-group input:focus { border-color: var(--green-500); }
-
-/* Score Management */
-.score-filter-bar {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-
-.score-filter-bar select {
-  padding: 8px 12px;
-  border: 2px solid var(--gray-200);
-  border-radius: 8px;
-  font-size: 14px;
+.inline-input-wide {
+  padding: 5px 10px;
+  border: 1px solid var(--gray-200);
+  border-radius: 6px;
+  font-size: 13px;
   font-family: inherit;
   color: var(--dark);
+  width: 150px;
   outline: none;
-  background: var(--white);
-  cursor: pointer;
 }
 
-.score-filter-bar select:focus { border-color: var(--green-500); }
+.inline-input-wide:focus { border-color: var(--green-500); }
 
-/* Course Settings */
 .course-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -430,7 +389,6 @@ body {
 
 .hole-input:focus { border-color: var(--green-500); }
 
-/* Stats Overview */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -462,7 +420,6 @@ body {
   color: var(--green-700);
 }
 
-/* Spinner */
 .spinner {
   width: 20px;
   height: 20px;
@@ -476,18 +433,134 @@ body {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Mobile */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 300;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal.active { display: flex; }
+
+.modal-content {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 28px 32px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.modal-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--dark);
+}
+
+.modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--gray-100);
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--gray-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.modal-close:hover { background: var(--gray-200); }
+
+.score-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.score-hole-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.score-hole-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  font-family: 'DM Mono', monospace;
+}
+
+.score-hole-input {
+  width: 100%;
+  padding: 6px 0;
+  border: 2px solid var(--gray-200);
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  font-weight: 600;
+  color: var(--dark);
+  outline: none;
+}
+
+.score-hole-input:focus { border-color: var(--green-500); }
+
+.library-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  background: var(--white);
+  transition: background 0.15s;
+}
+
+.library-item:hover { background: var(--green-50); }
+
+.library-item-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--dark);
+}
+
+.library-item-meta {
+  font-size: 12px;
+  color: var(--gray-400);
+  margin-top: 2px;
+}
+
 @media (max-width: 768px) {
   .admin-layout { grid-template-columns: 1fr; }
   .sidebar { position: static; height: auto; }
-  .add-form { grid-template-columns: 1fr 1fr; }
   .course-grid { grid-template-columns: 1fr; }
+  .score-edit-grid { grid-template-columns: repeat(3, 1fr); }
 }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav class="site-nav">
   <a href="index.html" class="nav-brand">BuschLight Cup</a>
   <div class="nav-links">
@@ -495,19 +568,26 @@ body {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span>Schedule</span>
     </a>
+    <a href="instructions.html" class="nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <span>Rules</span>
+    </a>
     <a href="scoring.html" class="nav-link">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       <span>Live Scores</span>
     </a>
+    <a href="daily-leaderboard.html" class="nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span>Leaderboard</span>
+    </a>
   </div>
 </nav>
 
-<!-- SCREEN: Auth Gate -->
 <div id="screen-auth" class="screen active">
   <div class="auth-gate">
     <div class="auth-card">
       <h2>Admin Panel</h2>
-      <p>Enter the admin passcode to access player management and settings.</p>
+      <p>Enter the admin passcode to access full CRUD management.</p>
       <div id="auth-alert"></div>
       <div class="form-group">
         <label class="form-label">Admin Passcode</label>
@@ -522,30 +602,37 @@ body {
   </div>
 </div>
 
-<!-- SCREEN: Admin App -->
 <div id="screen-admin" class="screen">
   <div class="admin-layout">
-
-    <!-- Sidebar -->
     <aside class="sidebar">
-      <div class="sidebar-label">Management</div>
-      <button class="sidebar-link active" onclick="showPanel('players')" id="sb-players">
+      <div class="sidebar-label">Libraries</div>
+      <button class="sidebar-link active" onclick="showPanel('courses')" id="sb-courses">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        <span>Courses</span>
+      </button>
+      <button class="sidebar-link" onclick="showPanel('formats')" id="sb-formats">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m5.2-14.2l-4.2 4.2m0 6l4.2 4.2M1 12h6m6 0h6m-14.2 5.2l4.2-4.2m0-6L4.8 4.8"/></svg>
+        <span>Game Formats</span>
+      </button>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-label">Trip Setup</div>
+      <button class="sidebar-link" onclick="showPanel('days')" id="sb-days">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Days Config</span>
+      </button>
+      <button class="sidebar-link" onclick="showPanel('players')" id="sb-players">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         <span>Players</span>
       </button>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-label">Data</div>
       <button class="sidebar-link" onclick="showPanel('scores')" id="sb-scores">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="3"/></svg>
         <span>Scores</span>
       </button>
-      <button class="sidebar-link" onclick="showPanel('courses')" id="sb-courses">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-        <span>Course Setup</span>
-      </button>
-      <div class="sidebar-divider"></div>
-      <div class="sidebar-label">Overview</div>
       <button class="sidebar-link" onclick="showPanel('overview')" id="sb-overview">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        <span>Stats</span>
+        <span>Overview</span>
       </button>
       <div class="sidebar-divider"></div>
       <button class="sidebar-link" onclick="adminSignOut()" style="color:rgba(255,255,255,0.4)">
@@ -554,84 +641,51 @@ body {
       </button>
     </aside>
 
-    <!-- Main -->
     <main class="main-content">
 
-      <!-- PANEL: Players -->
-      <div id="panel-players" class="panel active">
+      <!-- PANEL: Courses Library -->
+      <div id="panel-courses" class="panel active">
         <div class="panel-header">
           <div>
-            <div class="panel-title">Players</div>
-            <div class="panel-subtitle">Manage player profiles, handicaps, and registration</div>
+            <div class="panel-title">Course Library</div>
+            <div class="panel-subtitle">Reusable course configurations (par, slope, handicap order)</div>
           </div>
-          <button class="btn btn-primary btn-sm" onclick="refreshPlayers()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-            Refresh
-          </button>
+          <button class="btn btn-primary btn-sm" onclick="openCourseModal()">+ Add Course</button>
         </div>
 
-        <div id="players-alert"></div>
-
-        <!-- Add Player -->
-        <div class="card">
-          <div class="card-title">Add New Player</div>
-          <div class="add-form" id="add-player-form">
-            <div class="add-form-group">
-              <label>Display Name</label>
-              <input type="text" id="new-name" placeholder="e.g. John" maxlength="30">
-            </div>
-            <div class="add-form-group">
-              <label>Email Address</label>
-              <input type="email" id="new-email" placeholder="player@email.com">
-            </div>
-            <div class="add-form-group">
-              <label>Handicap Index</label>
-              <input type="number" id="new-handicap" placeholder="0.0" min="0" max="54" step="0.1" style="width:100%">
-            </div>
-            <div>
-              <button class="btn btn-primary" onclick="addPlayer()" style="height:42px">Add Player</button>
-            </div>
-          </div>
-          <p style="font-size:12px;color:var(--gray-400);margin-top:12px">
-            After adding a player, they can sign in with their email at <strong>scoring.html</strong> using the magic link. They'll appear in the system once they sign in for the first time.
-          </p>
-        </div>
-
-        <!-- Player List -->
-        <div class="card">
-          <div class="card-title">All Players</div>
-          <div id="players-loading" style="text-align:center;padding:24px;color:var(--gray-400)">
-            <span class="spinner"></span> Loading players...
-          </div>
-          <div id="players-table-wrap" style="display:none;overflow-x:auto">
-            <table class="player-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Handicap</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="players-tbody"></tbody>
-            </table>
-          </div>
-        </div>
+        <div id="courses-alert"></div>
+        <div id="courses-list"></div>
       </div>
 
-      <!-- PANEL: Scores -->
-      <div id="panel-scores" class="panel">
+      <!-- PANEL: Formats Library -->
+      <div id="panel-formats" class="panel">
         <div class="panel-header">
           <div>
-            <div class="panel-title">Score Management</div>
-            <div class="panel-subtitle">View and manage submitted scores</div>
+            <div class="panel-title">Game Format Library</div>
+            <div class="panel-subtitle">Reusable game formats (123 Ball, Chicago, etc.)</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openFormatModal()">+ Add Format</button>
+        </div>
+
+        <div id="formats-alert"></div>
+        <div id="formats-list"></div>
+      </div>
+
+      <!-- PANEL: Days Config -->
+      <div id="panel-days" class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Days Configuration</div>
+            <div class="panel-subtitle">Assign courses, formats, teams to each day</div>
           </div>
         </div>
 
-        <div class="score-filter-bar">
-          <select id="scores-day-filter" onchange="loadScoresPanel()">
-            <option value="">All Days</option>
+        <div id="days-alert"></div>
+
+        <div class="card">
+          <div class="card-title">Select Day</div>
+          <select id="day-select" class="form-input" style="max-width:360px;margin-bottom:20px" onchange="loadDayConfig()">
+            <option value="">— Select a day —</option>
             <option value="1">Day 1 — Sunday</option>
             <option value="2">Day 2 — Monday</option>
             <option value="3">Day 3 — Tuesday</option>
@@ -640,58 +694,155 @@ body {
             <option value="6">Day 6 — Friday</option>
             <option value="7">Day 7 — Saturday</option>
           </select>
-          <button class="btn btn-secondary btn-sm" onclick="loadScoresPanel()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-            Refresh
-          </button>
-        </div>
 
-        <div id="scores-content">
-          <div style="text-align:center;padding:40px;color:var(--gray-400)">Select a filter above to view scores</div>
+          <div id="day-config-form" style="display:none">
+            <h4 style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--green-700);margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--green-200)">Round 1 (Holes 1-18)</h4>
+
+            <div class="form-group">
+              <label class="form-label">Course</label>
+              <select id="day-course" class="form-input"></select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Game Format</label>
+              <select id="day-format" class="form-input"></select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Tee Time</label>
+              <input type="text" id="day-teetime" class="form-input" placeholder="e.g. 8:36 AM">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Replay Fee</label>
+              <input type="text" id="day-replay" class="form-input" placeholder="e.g. $15">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Purse ($)</label>
+              <input type="number" id="day-purse" class="form-input" placeholder="80" style="max-width:150px">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Team Assignments (JSON)</label>
+              <textarea id="day-teams" class="form-textarea" rows="4" placeholder='[["John","Andrew","Pete","Jim"],["Troy","Jeff","Denver","Scott"]]'></textarea>
+              <p style="font-size:12px;color:var(--gray-400);margin-top:6px">Enter as JSON array of arrays. Empty array [] for individual formats.</p>
+            </div>
+
+            <h4 style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--blue-accent);margin:24px 0 16px;padding-bottom:8px;border-bottom:2px solid #90caf9">Round 2 (Holes 19-36) — Optional</h4>
+
+            <div class="form-group">
+              <label class="form-label">Second Round Game Format (Optional)</label>
+              <select id="day-second-format" class="form-input">
+                <option value="">— No Second Round —</option>
+                <option value="345">3-4-5 (Par Competition)</option>
+                <option value="shamble">Shamble</option>
+                <option value="alt-shot">2-Person Alternate Shot</option>
+                <option value="rolly-polly">Rolly Polly 3-Putt</option>
+                <option value="hi-lo">Hi-Lo (High-Low)</option>
+                <option value="wolf">Wolf</option>
+                <option value="best-ball">Best Ball</option>
+                <option value="custom">Custom Format</option>
+              </select>
+              <p style="font-size:12px;color:var(--gray-400);margin-top:6px">Select a game format for holes 19-36 (replay round). Leave blank if no second round.</p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Second Round Purse ($)</label>
+              <input type="number" id="day-second-purse" class="form-input" placeholder="0" style="max-width:150px">
+              <p style="font-size:12px;color:var(--gray-400);margin-top:6px">Additional purse for second round game (optional).</p>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:20px">
+              <button class="btn btn-primary" onclick="saveDayConfig()">Save Day Config</button>
+              <button class="btn btn-secondary" onclick="loadDayConfig()">Reset</button>
+            </div>
+
+            <div id="day-save-alert" style="margin-top:12px"></div>
+          </div>
         </div>
       </div>
 
-      <!-- PANEL: Courses -->
-      <div id="panel-courses" class="panel">
+      <!-- PANEL: Players (same as before) -->
+      <div id="panel-players" class="panel">
         <div class="panel-header">
           <div>
-            <div class="panel-title">Course Setup</div>
-            <div class="panel-subtitle">Configure par and hole difficulty per day</div>
+            <div class="panel-title">Players</div>
+            <div class="panel-subtitle">Manage all players</div>
           </div>
+          <button class="btn btn-primary btn-sm" onclick="refreshPlayers()">Refresh</button>
+        </div>
+
+        <div id="players-alert"></div>
+
+        <div class="card">
+          <div class="card-title">Add Player</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 120px auto;gap:10px;align-items:end">
+            <div>
+              <label class="form-label">Name <span style="color:var(--red-accent)">*</span></label>
+              <input type="text" id="new-name" class="form-input" placeholder="John">
+            </div>
+            <div>
+              <label class="form-label">Email (optional)</label>
+              <input type="email" id="new-email" class="form-input" placeholder="player@email.com">
+            </div>
+            <div>
+              <label class="form-label">Handicap</label>
+              <input type="number" id="new-handicap" class="form-input" placeholder="0.0" min="0" max="54" step="0.1">
+            </div>
+            <div>
+              <button class="btn btn-primary" onclick="addPlayer()" style="height:42px">Add</button>
+            </div>
+          </div>
+          <p style="font-size:12px;color:var(--gray-400);margin-top:12px">Players will create a PIN when they first log in to score.</p>
         </div>
 
         <div class="card">
-          <div class="card-title">Select Day to Configure</div>
-          <select id="course-day-select" class="form-input" style="max-width:360px;margin-bottom:20px" onchange="loadCourseSetup()">
-            <option value="">— Select a day —</option>
-            <option value="1">Day 1 — Sunday · Lake Marion</option>
-            <option value="2">Day 2 — Monday · Santee Cooper</option>
-            <option value="3">Day 3 — Tuesday · Wyboo</option>
-            <option value="4">Day 4 — Wednesday · Santee National</option>
-            <option value="5">Day 5 — Thursday · Players Course</option>
-            <option value="6">Day 6 — Friday · Lake Marion</option>
-            <option value="7">Day 7 — Saturday · TBD</option>
-          </select>
-
-          <div id="course-setup-form" style="display:none">
-            <div class="course-grid">
-              <div>
-                <div class="card-title">Par Per Hole</div>
-                <div class="hole-grid" id="par-inputs"></div>
-              </div>
-              <div>
-                <div class="card-title">Difficulty Ranking (1=Hardest)</div>
-                <div class="hole-grid" id="hcp-inputs"></div>
-              </div>
-            </div>
-
-            <div style="margin-top:20px;display:flex;gap:10px">
-              <button class="btn btn-primary" onclick="saveCourseSetup()">Save Course Settings</button>
-              <button class="btn btn-secondary" onclick="resetCourseDefaults()">Reset to Defaults</button>
-            </div>
-
-            <div id="course-save-alert" style="margin-top:12px"></div>
+          <div class="card-title">All Players</div>
+          <div id="players-loading" style="text-align:center;padding:24px;color:var(--gray-400)">
+            <span class="spinner"></span> Loading...
           </div>
+          <div id="players-table-wrap" style="display:none;overflow-x:auto">
+            <table class="player-table">
+              <thead>
+                <tr><th>Name</th><th>Email</th><th>Handicap</th><th>PIN</th><th>Status</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="players-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL: Scores (full CRUD) -->
+      <div id="panel-scores" class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Scores</div>
+            <div class="panel-subtitle">View and manage submitted scores</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary btn-sm" onclick="openScoreModal()">+ Add Score</button>
+            <button class="btn btn-secondary btn-sm" onclick="loadScoresPanel()">Refresh</button>
+          </div>
+        </div>
+
+        <div id="scores-alert"></div>
+
+        <div class="card">
+          <select id="scores-day-filter" class="form-input" style="max-width:200px" onchange="loadScoresPanel()">
+            <option value="">All Days</option>
+            <option value="1">Day 1</option>
+            <option value="2">Day 2</option>
+            <option value="3">Day 3</option>
+            <option value="4">Day 4</option>
+            <option value="5">Day 5</option>
+            <option value="6">Day 6</option>
+            <option value="7">Day 7</option>
+          </select>
+        </div>
+
+        <div id="scores-content">
+          <div style="text-align:center;padding:40px;color:var(--gray-400)">Select a filter to view scores</div>
         </div>
       </div>
 
@@ -699,8 +850,8 @@ body {
       <div id="panel-overview" class="panel">
         <div class="panel-header">
           <div>
-            <div class="panel-title">Trip Overview</div>
-            <div class="panel-subtitle">Summary stats for BuschLight Cup 2026</div>
+            <div class="panel-title">Overview</div>
+            <div class="panel-subtitle">Trip statistics</div>
           </div>
           <button class="btn btn-secondary btn-sm" onclick="loadOverview()">Refresh</button>
         </div>
@@ -716,13 +867,138 @@ body {
   </div>
 </div>
 
-<!-- ============================================================
-     JAVASCRIPT
-     ============================================================ -->
+<!-- MODAL: Course Edit -->
+<div id="modal-course" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title" id="course-modal-title">Add Course</div>
+      <button class="modal-close" onclick="closeModal('modal-course')">×</button>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Course ID (unique, lowercase-hyphenated)</label>
+      <input type="text" id="course-id" class="form-input" placeholder="e.g. lake-marion">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Course Name</label>
+      <input type="text" id="course-name" class="form-input" placeholder="e.g. Lake Marion">
+    </div>
+
+    <div class="course-grid">
+      <div>
+        <div class="card-title" style="margin-bottom:8px">Par Per Hole</div>
+        <div class="hole-grid" id="course-par-inputs"></div>
+      </div>
+      <div>
+        <div class="card-title" style="margin-bottom:8px">Difficulty (1=Hardest)</div>
+        <div class="hole-grid" id="course-hcp-inputs"></div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button class="btn btn-primary" onclick="saveCourse()">Save Course</button>
+      <button class="btn btn-secondary" onclick="closeModal('modal-course')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Format Edit -->
+<div id="modal-format" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title" id="format-modal-title">Add Format</div>
+      <button class="modal-close" onclick="closeModal('modal-format')">×</button>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Format ID (unique, lowercase-hyphenated)</label>
+      <input type="text" id="format-id" class="form-input" placeholder="e.g. 123-ball">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Format Name</label>
+      <input type="text" id="format-name" class="form-input" placeholder="e.g. 123 Ball">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea id="format-description" class="form-textarea" rows="4" placeholder="Full explanation of the game format..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Scoring Type</label>
+      <select id="format-type" class="form-input">
+        <option value="team">Team</option>
+        <option value="individual">Individual</option>
+        <option value="matchplay">Match Play</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Default Purse ($)</label>
+      <input type="number" id="format-purse" class="form-input" placeholder="80" style="max-width:150px">
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button class="btn btn-primary" onclick="saveFormat()">Save Format</button>
+      <button class="btn btn-secondary" onclick="closeModal('modal-format')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Score Edit -->
+<div id="modal-score" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title" id="score-modal-title">Add Score</div>
+      <button class="modal-close" onclick="closeModal('modal-score')">×</button>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Player</label>
+      <select id="score-player" class="form-input"></select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Day</label>
+      <select id="score-day" class="form-input">
+        <option value="">— Select day —</option>
+        <option value="1">Day 1</option>
+        <option value="2">Day 2</option>
+        <option value="3">Day 3</option>
+        <option value="4">Day 4</option>
+        <option value="5">Day 5</option>
+        <option value="6">Day 6</option>
+        <option value="7">Day 7</option>
+      </select>
+    </div>
+
+    <div class="card-title" style="margin-top:16px;margin-bottom:12px">Hole-by-Hole Scores (Gross)</div>
+    <div class="score-edit-grid" id="score-holes-inputs"></div>
+
+    <div style="margin-top:16px;padding:12px;background:var(--green-50);border-radius:8px;font-size:13px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-weight:600">Gross Total:</span>
+        <span id="score-gross-total">0</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-weight:600">Net Total:</span>
+        <span id="score-net-total">0</span>
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--gray-600)">
+        Net score calculated using player's handicap and course difficulty.
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button class="btn btn-primary" onclick="saveScore()">Save Score</button>
+      <button class="btn btn-secondary" onclick="closeModal('modal-score')">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script>
-// ──────────────────────────────────────────────
-// Firebase Init
-// ──────────────────────────────────────────────
 const firebaseConfig = {
   apiKey: "AIzaSyC1soSELTncOWIeGa_oMJoWqTU7yKS1RHA",
   authDomain: "buschlightcup.firebaseapp.com",
@@ -733,31 +1009,30 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
 const db = firebase.firestore();
 
 const YEAR = 2026;
-
-// ══════════════════════════════════════════════
-// CHANGE THIS to your desired admin passcode
-// ══════════════════════════════════════════════
 const ADMIN_PASSCODE = 'busch2026';
 
-const DEFAULT_PARS     = [4,4,3,5,4,3,4,5,4, 4,3,5,4,4,3,5,4,4];
+const DEFAULT_PARS = [4,4,3,5,4,3,4,5,4, 4,3,5,4,4,3,5,4,4];
 const DEFAULT_HCP_ORDER = [1,5,9,13,3,15,7,11,17, 2,6,10,14,4,16,8,12,18];
 
 let adminAuthed = false;
+let allPlayers = [];
+let allCourses = [];
+let allFormats = [];
+let currentCourseEdit = null;
+let currentFormatEdit = null;
+let currentScoreEdit = null;
+let currentScoreData = {};
 
-// ──────────────────────────────────────────────
-// Auth Gate
-// ──────────────────────────────────────────────
 function checkPasscode() {
   const input = document.getElementById('admin-passcode').value;
   if (input === ADMIN_PASSCODE) {
     adminAuthed = true;
     document.getElementById('screen-auth').classList.remove('active');
     document.getElementById('screen-admin').classList.add('active');
-    refreshPlayers();
+    loadCourses();
     loadOverview();
   } else {
     document.getElementById('auth-alert').innerHTML =
@@ -773,36 +1048,361 @@ function adminSignOut() {
   document.getElementById('admin-passcode').value = '';
 }
 
-// ──────────────────────────────────────────────
-// Panel Navigation
-// ──────────────────────────────────────────────
 function showPanel(name) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
   document.getElementById(`panel-${name}`).classList.add('active');
   document.getElementById(`sb-${name}`).classList.add('active');
 
+  if (name === 'courses') loadCourses();
+  if (name === 'formats') loadFormats();
   if (name === 'players') refreshPlayers();
   if (name === 'scores') loadScoresPanel();
   if (name === 'overview') loadOverview();
 }
 
-// ──────────────────────────────────────────────
-// Players Panel
-// ──────────────────────────────────────────────
+// ===== COURSES =====
+async function loadCourses() {
+  try {
+    const snap = await db.collection('courses').get();
+    allCourses = [];
+    snap.forEach(doc => allCourses.push({ id: doc.id, ...doc.data() }));
+    renderCoursesList(allCourses);
+  } catch (err) {
+    showAlert('courses-alert', 'Error loading courses.', 'error');
+  }
+}
+
+function renderCoursesList(courses) {
+  const container = document.getElementById('courses-list');
+  if (!courses.length) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray-400)">No courses yet. Add one to get started.</div>';
+    return;
+  }
+
+  let html = '';
+  courses.forEach(c => {
+    html += `
+      <div class="library-item">
+        <div>
+          <div class="library-item-name">${escHtml(c.name || c.id)}</div>
+          <div class="library-item-meta">ID: ${c.id} • ${c.pars?.length || 0} holes</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-secondary btn-sm" onclick="editCourse('${c.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteCourse('${c.id}')">Delete</button>
+        </div>
+      </div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+function openCourseModal() {
+  currentCourseEdit = null;
+  document.getElementById('course-modal-title').textContent = 'Add Course';
+  document.getElementById('course-id').value = '';
+  document.getElementById('course-id').disabled = false;
+  document.getElementById('course-name').value = '';
+  renderCourseHoleInputs(DEFAULT_PARS, DEFAULT_HCP_ORDER);
+  openModal('modal-course');
+}
+
+async function editCourse(id) {
+  try {
+    const doc = await db.collection('courses').doc(id).get();
+    if (!doc.exists) {
+      showAlert('courses-alert', 'Course not found.', 'error');
+      return;
+    }
+
+    const data = doc.data();
+    currentCourseEdit = id;
+    document.getElementById('course-modal-title').textContent = 'Edit Course';
+    document.getElementById('course-id').value = id;
+    document.getElementById('course-id').disabled = true;
+    document.getElementById('course-name').value = data.name || '';
+    renderCourseHoleInputs(data.pars || DEFAULT_PARS, data.hcpOrder || DEFAULT_HCP_ORDER);
+    openModal('modal-course');
+  } catch (err) {
+    console.error('Error loading course:', err);
+    showAlert('courses-alert', 'Error loading course. Please try again.', 'error');
+  }
+}
+
+function renderCourseHoleInputs(pars, hcpOrder) {
+  const parGrid = document.getElementById('course-par-inputs');
+  const hcpGrid = document.getElementById('course-hcp-inputs');
+  parGrid.innerHTML = '';
+  hcpGrid.innerHTML = '';
+
+  for (let i = 0; i < 18; i++) {
+    parGrid.innerHTML += `
+      <div class="hole-input-wrap">
+        <div class="hole-input-label">H${i + 1}</div>
+        <input type="number" class="hole-input" id="c-par-${i}" value="${pars[i]}" min="3" max="6">
+      </div>`;
+
+    hcpGrid.innerHTML += `
+      <div class="hole-input-wrap">
+        <div class="hole-input-label">H${i + 1}</div>
+        <input type="number" class="hole-input" id="c-hcp-${i}" value="${hcpOrder[i]}" min="1" max="18">
+      </div>`;
+  }
+}
+
+async function saveCourse() {
+  const id = document.getElementById('course-id').value.trim().toLowerCase();
+  const name = document.getElementById('course-name').value.trim();
+
+  if (!id || !name) {
+    showAlert('courses-alert', 'ID and name are required.', 'error');
+    return;
+  }
+
+  const pars = [];
+  const hcpOrder = [];
+  for (let i = 0; i < 18; i++) {
+    pars.push(parseInt(document.getElementById(`c-par-${i}`).value) || 4);
+    hcpOrder.push(parseInt(document.getElementById(`c-hcp-${i}`).value) || (i + 1));
+  }
+
+  try {
+    await db.collection('courses').doc(id).set({
+      name, pars, hcpOrder,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    closeModal('modal-course');
+    loadCourses();
+    showAlert('courses-alert', `Course "${name}" saved successfully.`, 'success');
+  } catch (err) {
+    console.error('Error saving course:', err);
+    showAlert('courses-alert', 'Error saving course. Please try again.', 'error');
+  }
+}
+
+async function deleteCourse(id) {
+  if (!confirm(`Delete course "${id}"? This may affect days that reference it.`)) return;
+  try {
+    await db.collection('courses').doc(id).delete();
+    loadCourses();
+    showAlert('courses-alert', 'Course deleted successfully.', 'success');
+  } catch (err) {
+    console.error('Error deleting course:', err);
+    showAlert('courses-alert', 'Error deleting course. Please try again.', 'error');
+  }
+}
+
+// ===== FORMATS =====
+async function loadFormats() {
+  try {
+    const snap = await db.collection('formats').get();
+    allFormats = [];
+    snap.forEach(doc => allFormats.push({ id: doc.id, ...doc.data() }));
+    renderFormatsList(allFormats);
+  } catch (err) {
+    showAlert('formats-alert', 'Error loading formats.', 'error');
+  }
+}
+
+function renderFormatsList(formats) {
+  const container = document.getElementById('formats-list');
+  if (!formats.length) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray-400)">No formats yet. Add one to get started.</div>';
+    return;
+  }
+
+  let html = '';
+  formats.forEach(f => {
+    html += `
+      <div class="library-item">
+        <div>
+          <div class="library-item-name">${escHtml(f.name || f.id)}</div>
+          <div class="library-item-meta">ID: ${f.id} • ${f.scoringType || '—'}</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-secondary btn-sm" onclick="editFormat('${f.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteFormat('${f.id}')">Delete</button>
+        </div>
+      </div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+function openFormatModal() {
+  currentFormatEdit = null;
+  document.getElementById('format-modal-title').textContent = 'Add Format';
+  document.getElementById('format-id').value = '';
+  document.getElementById('format-id').disabled = false;
+  document.getElementById('format-name').value = '';
+  document.getElementById('format-description').value = '';
+  document.getElementById('format-type').value = 'team';
+  document.getElementById('format-purse').value = 80;
+  openModal('modal-format');
+}
+
+async function editFormat(id) {
+  try {
+    const doc = await db.collection('formats').doc(id).get();
+    if (!doc.exists) { alert('Format not found.'); return; }
+
+    const data = doc.data();
+    currentFormatEdit = id;
+    document.getElementById('format-modal-title').textContent = 'Edit Format';
+    document.getElementById('format-id').value = id;
+    document.getElementById('format-id').disabled = true;
+    document.getElementById('format-name').value = data.name || '';
+    document.getElementById('format-description').value = data.description || '';
+    document.getElementById('format-type').value = data.scoringType || 'team';
+    document.getElementById('format-purse').value = data.defaultPurse || 80;
+    openModal('modal-format');
+  } catch (err) {
+    alert('Error loading format.');
+  }
+}
+
+async function saveFormat() {
+  const id = document.getElementById('format-id').value.trim().toLowerCase();
+  const name = document.getElementById('format-name').value.trim();
+  const description = document.getElementById('format-description').value.trim();
+  const scoringType = document.getElementById('format-type').value;
+  const defaultPurse = parseInt(document.getElementById('format-purse').value) || 80;
+
+  if (!id || !name) { alert('ID and name required.'); return; }
+
+  try {
+    await db.collection('formats').doc(id).set({
+      name, description, scoringType, defaultPurse,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    closeModal('modal-format');
+    loadFormats();
+    showAlert('formats-alert', `Format "${name}" saved.`, 'success');
+  } catch (err) {
+    alert('Error saving format.');
+  }
+}
+
+async function deleteFormat(id) {
+  if (!confirm(`Delete format "${id}"? Days referencing it will break.`)) return;
+  try {
+    await db.collection('formats').doc(id).delete();
+    loadFormats();
+    showAlert('formats-alert', 'Format deleted.', 'success');
+  } catch (err) {
+    alert('Error deleting format.');
+  }
+}
+
+// ===== DAYS CONFIG =====
+async function loadDayConfig() {
+  const day = document.getElementById('day-select').value;
+  if (!day) { document.getElementById('day-config-form').style.display = 'none'; return; }
+
+  document.getElementById('day-config-form').style.display = 'block';
+
+  // Load courses and formats for dropdowns
+  if (!allCourses.length) await loadCourses();
+  if (!allFormats.length) await loadFormats();
+
+  const courseSelect = document.getElementById('day-course');
+  const formatSelect = document.getElementById('day-format');
+
+  courseSelect.innerHTML = '<option value="">— Select course —</option>' +
+    allCourses.map(c => `<option value="${c.id}">${c.name || c.id}</option>`).join('');
+
+  formatSelect.innerHTML = '<option value="">— Select format —</option>' +
+    allFormats.map(f => `<option value="${f.id}">${f.name || f.id}</option>`).join('');
+
+  // Load existing config
+  try {
+    const doc = await db.collection('days').doc(`${YEAR}_day${day}`).get();
+    const data = doc.exists ? doc.data() : {};
+
+    document.getElementById('day-course').value = data.courseRef || '';
+    document.getElementById('day-format').value = data.formatRef || '';
+    document.getElementById('day-teetime').value = data.teeTime || '';
+    document.getElementById('day-replay').value = data.replayFee || '';
+    document.getElementById('day-purse').value = data.purse || 80;
+    document.getElementById('day-teams').value = JSON.stringify(data.teams || [], null, 2);
+    document.getElementById('day-second-format').value = data.secondRoundFormat || '';
+    document.getElementById('day-second-purse').value = data.secondRoundPurse || 0;
+  } catch {
+    document.getElementById('day-course').value = '';
+    document.getElementById('day-format').value = '';
+    document.getElementById('day-teetime').value = '';
+    document.getElementById('day-replay').value = '';
+    document.getElementById('day-purse').value = 80;
+    document.getElementById('day-teams').value = '[]';
+    document.getElementById('day-second-format').value = '';
+    document.getElementById('day-second-purse').value = 0;
+  }
+}
+
+async function saveDayConfig() {
+  const day = document.getElementById('day-select').value;
+  if (!day) return;
+
+  const courseRef = document.getElementById('day-course').value;
+  const formatRef = document.getElementById('day-format').value;
+  const teeTime = document.getElementById('day-teetime').value.trim();
+  const replayFee = document.getElementById('day-replay').value.trim();
+  const purse = parseInt(document.getElementById('day-purse').value) || 80;
+  const secondRoundFormat = document.getElementById('day-second-format').value;
+  const secondRoundPurse = parseInt(document.getElementById('day-second-purse').value) || 0;
+
+  let teams = [];
+  try {
+    teams = JSON.parse(document.getElementById('day-teams').value);
+  } catch {
+    showAlert('day-save-alert', 'Invalid JSON for teams.', 'error');
+    return;
+  }
+
+  if (!courseRef || !formatRef) {
+    showAlert('day-save-alert', 'Course and format required.', 'error');
+    return;
+  }
+
+  const dayNames = ['','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+  try {
+    await db.collection('days').doc(`${YEAR}_day${day}`).set({
+      year: YEAR,
+      dayNumber: parseInt(day),
+      dayName: dayNames[day],
+      courseRef,
+      formatRef,
+      teeTime,
+      replayFee,
+      purse,
+      teams,
+      secondRoundFormat,
+      secondRoundPurse,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    showAlert('day-save-alert', `Day ${day} configuration saved.`, 'success');
+  } catch (err) {
+    showAlert('day-save-alert', 'Error saving.', 'error');
+  }
+}
+
+// ===== PLAYERS (simplified) =====
 async function refreshPlayers() {
   document.getElementById('players-loading').style.display = 'block';
   document.getElementById('players-table-wrap').style.display = 'none';
 
   try {
     const snap = await db.collection('players').get();
-    const players = [];
-    snap.forEach(doc => players.push({ id: doc.id, ...doc.data() }));
-    renderPlayersTable(players);
+    allPlayers = [];
+    snap.forEach(doc => allPlayers.push({ id: doc.id, ...doc.data() }));
+    renderPlayersTable(allPlayers);
   } catch (err) {
-    console.error(err);
-    document.getElementById('players-alert').innerHTML =
-      '<div class="alert alert-error">Error loading players. Check Firebase rules.</div>';
+    showAlert('players-alert', 'Error loading players.', 'error');
     document.getElementById('players-loading').style.display = 'none';
   }
 }
@@ -812,26 +1412,25 @@ function renderPlayersTable(players) {
   tbody.innerHTML = '';
 
   if (!players.length) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--gray-400)">No players yet. Add the first player above.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--gray-400)">No players yet.</td></tr>`;
   } else {
     players.forEach(p => {
+      const hasPIN = p.pinHash ? true : false;
+      const pinStatus = hasPIN
+        ? '<span class="badge badge-active">Set</span>'
+        : '<span class="badge" style="background:var(--gray-400)">Not Set</span>';
+
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${escHtml(p.name || '—')}</td>
-        <td style="font-size:13px;color:var(--gray-400)">${escHtml(p.email || '—')}</td>
-        <td>
-          <div class="inline-edit">
-            <input type="number" class="inline-input" value="${p.handicap || 0}" min="0" max="54" step="0.1"
-              id="hcp-${p.id}" onblur="updateHandicap('${p.id}', '${escHtml(p.name || '')}')">
-          </div>
-        </td>
+        <td><input type="text" class="inline-input-wide" value="${escHtml(p.name || '')}" onblur="updatePlayerField('${p.id}', 'name', this.value)"></td>
+        <td><input type="email" class="inline-input-wide" value="${escHtml(p.email || '')}" onblur="updatePlayerField('${p.id}', 'email', this.value)"></td>
+        <td><input type="number" class="inline-input" value="${p.handicap || 0}" min="0" max="54" step="0.1" onblur="updatePlayerField('${p.id}', 'handicap', parseFloat(this.value) || 0)"></td>
+        <td style="text-align:center">${pinStatus}</td>
         <td><span class="badge ${p.active !== false ? 'badge-active' : 'badge-inactive'}">${p.active !== false ? 'Active' : 'Inactive'}</span></td>
         <td>
           <div style="display:flex;gap:6px">
-            <button class="btn btn-secondary btn-sm" onclick="toggleActive('${p.id}', ${p.active !== false})">
-              ${p.active !== false ? 'Deactivate' : 'Activate'}
-            </button>
-            <button class="btn btn-danger btn-sm" onclick="deletePlayer('${p.id}', '${escHtml(p.name || '')}')">Delete</button>
+            <button class="btn btn-secondary btn-sm" onclick="toggleActive('${p.id}', ${p.active !== false})">${p.active !== false ? 'Deactivate' : 'Activate'}</button>
+            <button class="btn btn-danger btn-sm" onclick="deletePlayer('${p.id}')">Delete</button>
           </div>
         </td>`;
       tbody.appendChild(tr);
@@ -846,41 +1445,38 @@ async function addPlayer() {
   const name = document.getElementById('new-name').value.trim();
   const email = document.getElementById('new-email').value.trim().toLowerCase();
   const handicap = parseFloat(document.getElementById('new-handicap').value) || 0;
-  const alertEl = document.getElementById('players-alert');
 
-  if (!name) { alertEl.innerHTML = '<div class="alert alert-error">Name is required.</div>'; return; }
-  if (!email || !email.includes('@')) { alertEl.innerHTML = '<div class="alert alert-error">Valid email is required.</div>'; return; }
+  if (!name) { showAlert('players-alert', 'Name is required.', 'error'); return; }
 
   try {
-    // Store player profile keyed by email (UID unknown until they sign in)
-    // We use a separate "pending_players" collection for pre-registration
-    await db.collection('pending_players').doc(email).set({
+    // Create player directly in players collection with auto-generated ID
+    const playerData = {
       name,
-      email,
+      email: email || null,
       handicap,
       active: true,
-      addedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+      pinHash: null, // Will be set when player creates PIN
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
 
-    alertEl.innerHTML = `<div class="alert alert-success">${name} added. They can now sign in at scoring.html using ${email}.</div>`;
+    await db.collection('players').add(playerData);
+
+    showAlert('players-alert', `${name} added successfully.`, 'success');
     document.getElementById('new-name').value = '';
     document.getElementById('new-email').value = '';
     document.getElementById('new-handicap').value = '';
     refreshPlayers();
   } catch (err) {
-    console.error(err);
-    alertEl.innerHTML = '<div class="alert alert-error">Error adding player. Try again.</div>';
+    console.error('Error adding player:', err);
+    showAlert('players-alert', 'Error adding player.', 'error');
   }
 }
 
-async function updateHandicap(uid, name) {
-  const val = parseFloat(document.getElementById(`hcp-${uid}`).value) || 0;
+async function updatePlayerField(uid, field, value) {
   try {
-    await db.collection('players').doc(uid).update({ handicap: val });
-    showAlert('players-alert', `${name}'s handicap updated to ${val}.`, 'success');
+    await db.collection('players').doc(uid).update({ [field]: value });
   } catch (err) {
-    console.error(err);
-    showAlert('players-alert', 'Error updating handicap.', 'error');
+    showAlert('players-alert', `Error updating ${field}.`, 'error');
   }
 }
 
@@ -889,24 +1485,21 @@ async function toggleActive(uid, currentlyActive) {
     await db.collection('players').doc(uid).update({ active: !currentlyActive });
     refreshPlayers();
   } catch (err) {
-    showAlert('players-alert', 'Error updating player status.', 'error');
+    showAlert('players-alert', 'Error updating status.', 'error');
   }
 }
 
-async function deletePlayer(uid, name) {
-  if (!confirm(`Delete ${name}? This cannot be undone and will not delete their scores.`)) return;
+async function deletePlayer(uid) {
+  if (!confirm('Delete this player?')) return;
   try {
     await db.collection('players').doc(uid).delete();
-    showAlert('players-alert', `${name} removed.`, 'success');
     refreshPlayers();
   } catch (err) {
     showAlert('players-alert', 'Error deleting player.', 'error');
   }
 }
 
-// ──────────────────────────────────────────────
-// Scores Panel
-// ──────────────────────────────────────────────
+// ===== SCORES (full CRUD) =====
 async function loadScoresPanel() {
   const dayFilter = document.getElementById('scores-day-filter').value;
   const container = document.getElementById('scores-content');
@@ -917,221 +1510,255 @@ async function loadScoresPanel() {
     if (dayFilter) query = query.where('dayNumber', '==', parseInt(dayFilter));
 
     const snap = await query.get();
-    const allScores = [];
-    snap.forEach(doc => allScores.push({ id: doc.id, ...doc.data() }));
-
-    if (!allScores.length) {
-      container.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400)">No scores found for the selected filter.</div>';
+    if (snap.empty) {
+      container.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400)">No scores found.</div>';
       return;
     }
 
-    // Group by day
-    const byDay = {};
-    allScores.forEach(s => {
-      if (!byDay[s.dayNumber]) byDay[s.dayNumber] = [];
-      byDay[s.dayNumber].push(s);
-    });
-
-    let html = '';
-    Object.keys(byDay).sort().forEach(day => {
-      const dayScores = byDay[day];
-      html += `
-        <div class="card" style="margin-bottom:16px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-            <div class="card-title">Day ${day} — ${dayScores[0]?.dayName || ''}</div>
-            <button class="btn btn-danger btn-sm" onclick="clearDayScores(${day})">Clear All Day ${day} Scores</button>
+    let html = '<div class="card"><table class="player-table"><thead><tr><th>Player</th><th>Day</th><th>Gross</th><th>Net</th><th>Holes</th><th>Actions</th></tr></thead><tbody>';
+    snap.forEach(doc => {
+      const s = doc.data();
+      const scoreId = doc.id;
+      html += `<tr>
+        <td>${escHtml(s.playerName || '—')}</td>
+        <td>Day ${s.dayNumber}</td>
+        <td>${s.grossTotal || '—'}</td>
+        <td>${s.netTotal || '—'}</td>
+        <td>${s.holesCompleted || 0} / 18</td>
+        <td>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-secondary btn-sm" onclick="editScore('${scoreId}')">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteScore('${scoreId}')">Delete</button>
           </div>
-          <div style="overflow-x:auto">
-            <table class="player-table">
-              <thead>
-                <tr>
-                  <th>Player</th><th>Handicap</th><th>Holes</th>
-                  <th>Gross</th><th>Net</th><th>Chicago</th><th>Updated</th><th></th>
-                </tr>
-              </thead>
-              <tbody>`;
-
-      dayScores.forEach(s => {
-        const updated = s.lastUpdated?.toDate
-          ? new Date(s.lastUpdated.toDate()).toLocaleString()
-          : '—';
-        html += `
-          <tr>
-            <td>${escHtml(s.playerName || '—')}</td>
-            <td>${s.handicap ?? '—'}</td>
-            <td>${s.holesCompleted ?? 0} / 18</td>
-            <td>${s.grossTotal ?? '—'}</td>
-            <td>${s.netTotal ?? '—'}</td>
-            <td>${s.chicagoScore !== undefined ? (s.chicagoScore >= 0 ? '+' : '') + s.chicagoScore : '—'}</td>
-            <td style="font-size:12px;color:var(--gray-400)">${updated}</td>
-            <td>
-              <button class="btn btn-danger btn-sm" onclick="deleteScore('${s.id}', '${escHtml(s.playerName || '')}', ${day})">
-                Delete
-              </button>
-            </td>
-          </tr>`;
-      });
-
-      html += `</tbody></table></div></div>`;
+        </td>
+      </tr>`;
     });
+    html += '</tbody></table></div>';
 
     container.innerHTML = html;
   } catch (err) {
-    console.error(err);
     container.innerHTML = '<div class="alert alert-error">Error loading scores.</div>';
   }
 }
 
-async function deleteScore(docId, playerName, day) {
-  if (!confirm(`Delete ${playerName}'s score for Day ${day}? This cannot be undone.`)) return;
+async function openScoreModal() {
+  currentScoreEdit = null;
+  currentScoreData = {};
+  document.getElementById('score-modal-title').textContent = 'Add Score';
+
+  // Load players for dropdown
+  if (!allPlayers.length) await refreshPlayers();
+  const playerSelect = document.getElementById('score-player');
+  playerSelect.innerHTML = '<option value="">— Select player —</option>' +
+    allPlayers.map(p => `<option value="${p.id}">${escHtml(p.name || p.email)}</option>`).join('');
+
+  document.getElementById('score-day').value = '';
+
+  // Render empty hole inputs
+  renderScoreHoleInputs(Array(18).fill(0));
+  updateScoreTotals();
+
+  openModal('modal-score');
+}
+
+async function editScore(scoreId) {
   try {
-    await db.collection('scores').doc(docId).delete();
+    const doc = await db.collection('scores').doc(scoreId).get();
+    if (!doc.exists) { alert('Score not found.'); return; }
+
+    const data = doc.data();
+    currentScoreEdit = scoreId;
+    currentScoreData = data;
+
+    document.getElementById('score-modal-title').textContent = 'Edit Score';
+
+    // Load players
+    if (!allPlayers.length) await refreshPlayers();
+    const playerSelect = document.getElementById('score-player');
+    playerSelect.innerHTML = '<option value="">— Select player —</option>' +
+      allPlayers.map(p => `<option value="${p.id}">${escHtml(p.name || p.email)}</option>`).join('');
+
+    // Set values
+    document.getElementById('score-player').value = data.uid || '';
+    document.getElementById('score-day').value = String(data.dayNumber || '');
+
+    // Render holes
+    renderScoreHoleInputs(data.holes || Array(18).fill(0));
+    updateScoreTotals();
+
+    openModal('modal-score');
+  } catch (err) {
+    alert('Error loading score.');
+  }
+}
+
+function renderScoreHoleInputs(holes) {
+  const container = document.getElementById('score-holes-inputs');
+  container.innerHTML = '';
+
+  for (let i = 0; i < 18; i++) {
+    container.innerHTML += `
+      <div class="score-hole-box">
+        <div class="score-hole-label">H${i + 1}</div>
+        <input type="number" class="score-hole-input" id="hole-${i}" value="${holes[i] || 0}" min="0" max="15" oninput="updateScoreTotals()">
+      </div>`;
+  }
+}
+
+async function updateScoreTotals() {
+  const holes = [];
+  let grossTotal = 0;
+
+  for (let i = 0; i < 18; i++) {
+    const val = parseInt(document.getElementById(`hole-${i}`).value) || 0;
+    holes[i] = val;
+    grossTotal += val;
+  }
+
+  document.getElementById('score-gross-total').textContent = grossTotal;
+
+  // Calculate net (if player and day selected)
+  const playerUid = document.getElementById('score-player').value;
+  const dayNum = parseInt(document.getElementById('score-day').value);
+
+  if (playerUid && dayNum) {
+    const player = allPlayers.find(p => p.id === playerUid);
+    if (player && player.handicap) {
+      try {
+        // Load course for the day
+        const dayDoc = await db.collection('days').doc(`${YEAR}_day${dayNum}`).get();
+        if (dayDoc.exists) {
+          const dayData = dayDoc.data();
+          const courseDoc = await db.collection('courses').doc(dayData.courseRef).get();
+          if (courseDoc.exists) {
+            const courseData = courseDoc.data();
+            const netTotal = calculateNetScore(holes, player.handicap, courseData.hcpOrder);
+            document.getElementById('score-net-total').textContent = netTotal;
+            return;
+          }
+        }
+      } catch (err) {
+        console.error('Error calculating net:', err);
+      }
+    }
+  }
+
+  document.getElementById('score-net-total').textContent = grossTotal;
+}
+
+function calculateNetScore(holes, handicap, hcpOrder) {
+  const ch = Math.round(handicap);
+  let netTotal = 0;
+
+  for (let i = 0; i < 18; i++) {
+    const gross = holes[i] || 0;
+    const holeHcp = hcpOrder[i];
+    const strokes = (ch >= holeHcp) ? 1 : 0;
+    const net = Math.max(0, gross - strokes);
+    netTotal += net;
+  }
+
+  return netTotal;
+}
+
+async function saveScore() {
+  const playerUid = document.getElementById('score-player').value;
+  const dayNum = parseInt(document.getElementById('score-day').value);
+
+  if (!playerUid || !dayNum) {
+    alert('Player and day required.');
+    return;
+  }
+
+  const holes = [];
+  let grossTotal = 0;
+  let holesCompleted = 0;
+
+  for (let i = 0; i < 18; i++) {
+    const val = parseInt(document.getElementById(`hole-${i}`).value) || 0;
+    holes[i] = val;
+    grossTotal += val;
+    if (val > 0) holesCompleted++;
+  }
+
+  const player = allPlayers.find(p => p.id === playerUid);
+  if (!player) { alert('Player not found.'); return; }
+
+  try {
+    // Load day and course to calculate net
+    const dayDoc = await db.collection('days').doc(`${YEAR}_day${dayNum}`).get();
+    if (!dayDoc.exists) { alert('Day configuration not found.'); return; }
+
+    const dayData = dayDoc.data();
+    const courseDoc = await db.collection('courses').doc(dayData.courseRef).get();
+    if (!courseDoc.exists) { alert('Course not found.'); return; }
+
+    const courseData = courseDoc.data();
+    const netTotal = calculateNetScore(holes, player.handicap || 0, courseData.hcpOrder);
+
+    const scoreData = {
+      uid: playerUid,
+      playerName: player.name || player.email,
+      year: YEAR,
+      dayNumber: dayNum,
+      holes,
+      grossTotal,
+      netTotal,
+      holesCompleted,
+      submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    if (currentScoreEdit) {
+      // Update existing
+      await db.collection('scores').doc(currentScoreEdit).update(scoreData);
+    } else {
+      // Create new
+      await db.collection('scores').add(scoreData);
+    }
+
+    closeModal('modal-score');
     loadScoresPanel();
+    showAlert('scores-alert', 'Score saved.', 'success');
+  } catch (err) {
+    alert('Error saving score: ' + err.message);
+  }
+}
+
+async function deleteScore(scoreId) {
+  if (!confirm('Delete this score? This cannot be undone.')) return;
+  try {
+    await db.collection('scores').doc(scoreId).delete();
+    loadScoresPanel();
+    showAlert('scores-alert', 'Score deleted.', 'success');
   } catch (err) {
     alert('Error deleting score.');
   }
 }
 
-async function clearDayScores(day) {
-  if (!confirm(`Clear ALL scores for Day ${day}? This cannot be undone.`)) return;
-  try {
-    const snap = await db.collection('scores')
-      .where('year', '==', YEAR)
-      .where('dayNumber', '==', parseInt(day))
-      .get();
-    const batch = db.batch();
-    snap.forEach(doc => batch.delete(doc.ref));
-    await batch.commit();
-    loadScoresPanel();
-  } catch (err) {
-    alert('Error clearing scores.');
-  }
-}
-
-// ──────────────────────────────────────────────
-// Course Setup Panel
-// ──────────────────────────────────────────────
-let courseEditData = { pars: [...DEFAULT_PARS], hcpOrder: [...DEFAULT_HCP_ORDER] };
-
-async function loadCourseSetup() {
-  const day = document.getElementById('course-day-select').value;
-  if (!day) { document.getElementById('course-setup-form').style.display = 'none'; return; }
-
-  document.getElementById('course-setup-form').style.display = 'block';
-
-  // Load existing data
-  try {
-    const doc = await db.collection('courses').doc(`${YEAR}_day${day}`).get();
-    if (doc.exists) {
-      const d = doc.data();
-      courseEditData.pars = d.pars || [...DEFAULT_PARS];
-      courseEditData.hcpOrder = d.hcpOrder || [...DEFAULT_HCP_ORDER];
-    } else {
-      courseEditData = { pars: [...DEFAULT_PARS], hcpOrder: [...DEFAULT_HCP_ORDER] };
-    }
-  } catch {
-    courseEditData = { pars: [...DEFAULT_PARS], hcpOrder: [...DEFAULT_HCP_ORDER] };
-  }
-
-  renderHoleInputs();
-}
-
-function renderHoleInputs() {
-  const parGrid = document.getElementById('par-inputs');
-  const hcpGrid = document.getElementById('hcp-inputs');
-  parGrid.innerHTML = '';
-  hcpGrid.innerHTML = '';
-
-  for (let i = 0; i < 18; i++) {
-    parGrid.innerHTML += `
-      <div class="hole-input-wrap">
-        <div class="hole-input-label">H${i + 1}</div>
-        <input type="number" class="hole-input" id="par-h${i}" value="${courseEditData.pars[i]}" min="3" max="6">
-      </div>`;
-
-    hcpGrid.innerHTML += `
-      <div class="hole-input-wrap">
-        <div class="hole-input-label">H${i + 1}</div>
-        <input type="number" class="hole-input" id="hcp-h${i}" value="${courseEditData.hcpOrder[i]}" min="1" max="18">
-      </div>`;
-  }
-}
-
-async function saveCourseSetup() {
-  const day = document.getElementById('course-day-select').value;
-  if (!day) return;
-
-  const pars = [];
-  const hcpOrder = [];
-  for (let i = 0; i < 18; i++) {
-    pars.push(parseInt(document.getElementById(`par-h${i}`).value) || 4);
-    hcpOrder.push(parseInt(document.getElementById(`hcp-h${i}`).value) || (i + 1));
-  }
-
-  try {
-    await db.collection('courses').doc(`${YEAR}_day${day}`).set({ pars, hcpOrder, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    showAlert('course-save-alert', 'Course settings saved successfully.', 'success');
-  } catch (err) {
-    showAlert('course-save-alert', 'Error saving. Check your connection.', 'error');
-  }
-}
-
-function resetCourseDefaults() {
-  courseEditData = { pars: [...DEFAULT_PARS], hcpOrder: [...DEFAULT_HCP_ORDER] };
-  renderHoleInputs();
-}
-
-// ──────────────────────────────────────────────
-// Overview Panel
-// ──────────────────────────────────────────────
+// ===== OVERVIEW =====
 async function loadOverview() {
   const container = document.getElementById('overview-content');
   try {
-    const [playersSnap, scoresSnap] = await Promise.all([
+    const [playersSnap, scoresSnap, coursesSnap, formatsSnap] = await Promise.all([
       db.collection('players').get(),
-      db.collection('scores').where('year', '==', YEAR).get()
+      db.collection('scores').where('year', '==', YEAR).get(),
+      db.collection('courses').get(),
+      db.collection('formats').get()
     ]);
-
-    const playerCount = playersSnap.size;
-    const scoreCount = scoresSnap.size;
-    let holesEntered = 0;
-    scoresSnap.forEach(doc => { holesEntered += doc.data().holesCompleted || 0; });
-
-    // Days with at least one score
-    const activeDays = new Set();
-    scoresSnap.forEach(doc => activeDays.add(doc.data().dayNumber));
 
     container.innerHTML = `
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-label">Players Registered</div><div class="stat-value">${playerCount}</div></div>
-        <div class="stat-card"><div class="stat-label">Score Cards</div><div class="stat-value">${scoreCount}</div></div>
-        <div class="stat-card"><div class="stat-label">Holes Entered</div><div class="stat-value">${holesEntered}</div></div>
-        <div class="stat-card"><div class="stat-label">Days Active</div><div class="stat-value">${activeDays.size} / 7</div></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Active Days</div>
-        <p style="font-size:14px;color:var(--gray-600)">${activeDays.size > 0
-          ? `Scores have been submitted for Day(s): ${[...activeDays].sort().join(', ')}`
-          : 'No scores submitted yet.'
-        }</p>
-      </div>
-      <div class="card">
-        <div class="card-title">Quick Links</div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <a href="scoring.html" class="btn btn-secondary btn-sm" target="_blank">Open Scoring App</a>
-          <a href="instructions.html" class="btn btn-secondary btn-sm" target="_blank">Open Rules Page</a>
-          <a href="index.html" class="btn btn-secondary btn-sm" target="_blank">Open Schedule</a>
-        </div>
+        <div class="stat-card"><div class="stat-label">Players</div><div class="stat-value">${playersSnap.size}</div></div>
+        <div class="stat-card"><div class="stat-label">Courses</div><div class="stat-value">${coursesSnap.size}</div></div>
+        <div class="stat-card"><div class="stat-label">Formats</div><div class="stat-value">${formatsSnap.size}</div></div>
+        <div class="stat-card"><div class="stat-label">Scores</div><div class="stat-value">${scoresSnap.size}</div></div>
       </div>`;
   } catch (err) {
-    console.error(err);
-    container.innerHTML = '<div class="alert alert-error">Error loading overview. Check Firebase rules.</div>';
+    container.innerHTML = '<div class="alert alert-error">Error loading overview.</div>';
   }
 }
 
-// ──────────────────────────────────────────────
-// Utilities
-// ──────────────────────────────────────────────
+// ===== UTILITIES =====
 function showAlert(containerId, msg, type) {
   const el = document.getElementById(containerId);
   el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
@@ -1142,10 +1769,13 @@ function escHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-// Enter key on passcode
-document.getElementById('admin-passcode').addEventListener('keydown', e => {
-  if (e.key === 'Enter') checkPasscode();
-});
+function openModal(id) {
+  document.getElementById(id).classList.add('active');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
 </script>
 </body>
 </html>
