@@ -1202,11 +1202,6 @@ async function loadWeekView() {
 function renderWeekView(allScores) {
   const container = document.getElementById('week-leaderboard-content');
 
-  if (!allScores.length) {
-    container.innerHTML = '<div class="week-view-empty">No scores submitted yet.<br>Tournament standings will appear here as players complete rounds.</div>';
-    return;
-  }
-
   // Group scores by player
   const playerScores = {};
 
@@ -1235,6 +1230,19 @@ function renderWeekView(allScores) {
       playerScores[uid].totalNet += score.netTotal || 0;
       playerScores[uid].totalGross += score.grossTotal || 0;
       playerScores[uid].roundsPlayed++;
+    }
+  });
+
+  // Add all active players who don't have scores yet
+  allPlayers.forEach(player => {
+    if (!playerScores[player.uid]) {
+      playerScores[player.uid] = {
+        name: player.name,
+        scores: {},
+        totalNet: 0,
+        totalGross: 0,
+        roundsPlayed: 0
+      };
     }
   });
 
@@ -1416,17 +1424,15 @@ function renderScorecard(scores) {
   if (hcpRow) tbody.appendChild(hcpRow);
   if (parRow) tbody.appendChild(parRow);
 
-  // Handle empty scores
-  if (!scores || scores.length === 0) {
-    const emptyRow = document.createElement('tr');
-    emptyRow.innerHTML = '<td colspan="24" style="text-align:center;padding:40px 20px;color:var(--gray-400);font-size:16px">No scores submitted yet for this round.<br><span style="font-size:14px;margin-top:8px;display:inline-block">Scores will appear here once players start submitting.</span></td>';
-    tbody.appendChild(emptyRow);
-    return;
+  // Initialize scores array if empty
+  if (!scores) {
+    scores = [];
   }
 
   // If no teams configured, show all players
   if (!currentTeams || currentTeams.length === 0) {
-    const playerNames = scores.map(s => s.playerName).filter(name => name);
+    // Use all active players from the database
+    const playerNames = allPlayers.map(p => p.name);
     if (playerNames.length === 0) {
       const emptyRow = document.createElement('tr');
       emptyRow.innerHTML = '<td colspan="24" style="text-align:center;padding:40px 20px;color:var(--gray-400)">No player data available.</td>';
